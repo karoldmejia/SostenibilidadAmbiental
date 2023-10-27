@@ -2,17 +2,17 @@ package model;
 
 public abstract class User {
     int idUser=0;
-    String nameUser;
+    String username;
     String password;
 
-    User(String nameUser, String password){
+    User(String username, String password){
         idUser+=1;
-        this.nameUser=nameUser;
+        this.username=username;
         this.password=password;
     }
 
-    public String getNameUser() {
-        return nameUser;
+    public String getUsername() {
+        return username;
     }
 
     public String getPassword() {

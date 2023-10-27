@@ -40,24 +40,25 @@ public class Main {
     }
 
 
-    public void menuUser(int optUser) {
+    public void menuUser(int userType) {
         int optMenu = -1;
         while (optMenu != 0) {
-            if (optUser == 1 || optUser == 2 || optUser == 3) {
+            if (userType == 1 || userType == 2 || userType == 3) {
                 showText("\nDesea (0 para ir a inicio):\n1. Visualizar mapa de puntos de interés\n");
             }
-            if (optUser == 2 || optUser == 3) {
+            if (userType == 2 || userType == 3) {
                 showText("2. Crear una reseña\n");
             }
-            if (optUser == 3) {
+            if (userType == 3) {
                 showText("3. Consultar proyecto\n4. Registrar proyecto\n5. Modificar proyecto\n6. Eliminar proyecto\n7. Registrar evidencia\n8. Modificar evidencia\n9. Desactivar evidencia\n10. Revisar reseña\n");
             }
+
             optMenu = Main.txt.nextInt();
-            if ((optUser == 1 || optUser == 2 || optUser == 3) && optMenu == 1) {
+            if ((userType == 1 || userType == 2 || userType == 3) && optMenu == 1) {
                 controller.visualizeMap();
-            } else if ((optUser == 2 || optUser == 3) && optMenu == 2) {
+            } else if ((userType == 2 || userType == 3) && optMenu == 2) {
                 controller.createView();
-            } else if (optUser == 3 && optMenu >= 3 && optMenu <= 10) {
+            } else if (userType == 3 && optMenu >= 3 && optMenu <= 10) {
                 switch (optMenu) {
                     case 3:
                         controller.seeProject();
@@ -88,7 +89,7 @@ public class Main {
                 showText("Redirigiendo a inicio... ");
                 credentialUser();
             } else {
-                showText("Please enter a valid option");
+                showText("Please, select a valid option\n");
             }
         }
     }

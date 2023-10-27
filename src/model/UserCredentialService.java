@@ -111,7 +111,7 @@ public class UserCredentialService {
 
     public boolean isUsernameValid() {
         for (User user : userList) {
-            if (user != null && username.equals(user.getNameUser())) {
+            if (user != null && username.equals(user.getUsername())) {
                     main.showText("Lo siento, el nombre de usuario que has ingresado ya está registrado. Por favor, elige un nombre de usuario diferente.\n");
                     return false;
                 }
@@ -120,17 +120,20 @@ public class UserCredentialService {
     }
 
 // Log in methods ------------------------------------
-    public void loginUser(String username, String password){
+    public void loginUser(String username, String password) {
         boolean found = false;
+        int userType = -1;
         for (User user : userList) {
-            if (user != null && username.equals(user.getNameUser()) && password.equals(user.getPassword())) {
+            if (user != null && username.equals(user.getUsername()) && password.equals(user.getPassword())) {
                 found = true;
-                if ((user instanceof Visitor)) {
-                    main.menuUser(1);
-                } else if (user instanceof DataGatherer) {
-                    main.menuUser(2);
-                } else if (user instanceof Researcher) {
-                    main.menuUser(3);
+                if (user instanceof Visitor) {
+                    userType = 1;
+                }
+                if (user instanceof DataGatherer) {
+                    userType = 2;
+                }
+                if (user instanceof Researcher) {
+                    userType = 3;
                 }
                 break;
             }
@@ -140,6 +143,7 @@ public class UserCredentialService {
             main.credentialUser();
         } else {
             main.showText("Haz ingresado exitosamente!\n");
+            main.menuUser(userType);
         }
     }
 }
