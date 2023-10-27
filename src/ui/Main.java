@@ -52,7 +52,6 @@ public class Main {
             if (userType == 3) {
                 showText("3. Consultar proyecto\n4. Registrar proyecto\n5. Modificar proyecto\n6. Eliminar proyecto\n7. Registrar evidencia\n8. Modificar evidencia\n9. Desactivar evidencia\n10. Revisar reseña\n");
             }
-
             optMenu = Main.txt.nextInt();
             if ((userType == 1 || userType == 2 || userType == 3) && optMenu == 1) {
                 controller.visualizeMap();

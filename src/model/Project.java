@@ -21,4 +21,7 @@ public class Project {
         this.status=status;
     }
 
+    public String getNameProject() {
+        return nameProject;
+    }
 }

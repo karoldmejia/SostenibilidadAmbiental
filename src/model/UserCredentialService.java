@@ -9,13 +9,14 @@ public class UserCredentialService {
     private Main main;
     User[] userList;
 
-    int counterUsers = 0, userType;
+    int counterUsers = 0;
     private String username, password, fullname, email, phone, universityArea, position;
-
     public UserCredentialService() {
         main = new Main();
         userList = new User[100];
     }
+
+    // Sign in methods --------------------------------------------
 
     public void registerVisitor(int optUser) {
         if (optUser == 1 && registerInfo(1)) {
@@ -79,6 +80,36 @@ public class UserCredentialService {
         return false;
     }
 
+    // Login methods --------------------------------------------
+    public void loginUser(String username, String password) {
+        boolean found = false;
+        int userType = -1;
+        for (User user : userList) {
+            if (user != null && username.equals(user.getUsername()) && password.equals(user.getPassword())) {
+                found = true;
+                if (user instanceof Visitor) {
+                    userType = 1;
+                }
+                if (user instanceof DataGatherer) {
+                    userType = 2;
+                }
+                if (user instanceof Researcher) {
+                    userType = 3;
+                }
+                break;
+            }
+        }
+        if (!found) {
+            main.showText("El usuario o la contraseña son erróneos\n");
+            main.credentialUser();
+        } else {
+            main.showText("Haz ingresado exitosamente!\n");
+            main.menuUser(userType);
+        }
+    }
+
+    // Support methods --------------------------------------------
+
     private boolean isValidPassword(String password) {
         if (password.length() >= 8) {
             return true;
@@ -109,42 +140,14 @@ public class UserCredentialService {
         }
     }
 
-    public boolean isUsernameValid() {
+    private boolean isUsernameValid() {
         for (User user : userList) {
             if (user != null && username.equals(user.getUsername())) {
-                    main.showText("Lo siento, el nombre de usuario que has ingresado ya está registrado. Por favor, elige un nombre de usuario diferente.\n");
-                    return false;
-                }
-        }
-        return true;
-    }
-
-// Log in methods ------------------------------------
-    public void loginUser(String username, String password) {
-        boolean found = false;
-        int userType = -1;
-        for (User user : userList) {
-            if (user != null && username.equals(user.getUsername()) && password.equals(user.getPassword())) {
-                found = true;
-                if (user instanceof Visitor) {
-                    userType = 1;
-                }
-                if (user instanceof DataGatherer) {
-                    userType = 2;
-                }
-                if (user instanceof Researcher) {
-                    userType = 3;
-                }
-                break;
+                main.showText("Lo siento, el nombre de usuario que has ingresado ya está registrado. Por favor, elige un nombre de usuario diferente.\n");
+                return false;
             }
         }
-        if (!found) {
-            main.showText("El usuario o la contraseña son erróneos\n");
-            main.credentialUser();
-        } else {
-            main.showText("Haz ingresado exitosamente!\n");
-            main.menuUser(userType);
-        }
+        return true;
     }
 }
 

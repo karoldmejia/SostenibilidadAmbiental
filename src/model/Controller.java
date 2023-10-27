@@ -5,9 +5,11 @@ import ui.Main;
 public class Controller {
     private Main main;
     private UserCredentialService userCredentialService;
+    private ProjectManagementService projectManagementService;
     public Controller(){
         main=new Main();
         userCredentialService=new UserCredentialService();
+        projectManagementService=new ProjectManagementService();
     }
 
     public void registerUser() {
@@ -39,6 +41,7 @@ public class Controller {
     public void createView(){
     }
     public void createProject(){
+        projectManagementService.createProject();
     }
     public void seeProject(){
     }

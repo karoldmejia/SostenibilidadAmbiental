@@ -15,5 +15,7 @@ public abstract class EvidenceProject {
         this.registerDate=registerDate;
     }
 
-
+    public String getNameEvidence() {
+        return nameEvidence;
+    }
 }
