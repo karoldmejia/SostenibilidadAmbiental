@@ -9,7 +9,6 @@ public class Researcher extends DataGatherer{
         super(username, password, fullName, email, phone);
         this.universityArea=universityArea;
         this.position=position;
-
     }
 
 
