@@ -10,6 +10,7 @@ public class Controller {
         main=new Main();
         userCredentialService=new UserCredentialService();
         projectManagementService=new ProjectManagementService();
+
     }
 
     public void registerUser() {
@@ -40,20 +41,73 @@ public class Controller {
     }
     public void createView(){
     }
+
+    private String showSelectProjects(){
+        main.showText("These are the registered projects: " + projectManagementService.getAllProjectsNames());
+        String idProject = main.getInputString("\nPlease insert the name of one of them: ");
+        return idProject;
+    }
     public void createProject(){
         projectManagementService.createProject();
     }
     public void seeProject(){
+        if (projectManagementService.projects.size()>0) {
+            String idProject=showSelectProjects();
+            projectManagementService.queryProject(idProject);
+        } else {
+            main.showText("Projects have not been registered yet :(");
+        }
     }
-    public void modifyProject(){
+    public void updateProject(){
+        if (projectManagementService.projects.size()>0) {
+            String idProject=showSelectProjects();
+            projectManagementService.updateProject(idProject);
+        } else {
+            main.showText("Projects have not been registered yet :(");
+        }
     }
     public void deleteProject(){
+        if (projectManagementService.projects.size()>0) {
+            String idProject=showSelectProjects();
+            String checkDecision=main.getInputString("¿Está usted seguro que desea eliminar el proyecto? Press 'si' or any other letter for otherwise\n");
+            if (checkDecision.equalsIgnoreCase("si")){
+                projectManagementService.deleteProject(idProject);
+            } else {
+                main.showText("Okey, let's get back to the menu!\n");
+            }
+        } else {
+            main.showText("Projects have not been registered yet :(");
+        }
     }
-    public void createEvidence(){
+    public void createEvidence(int userType){
+        projectManagementService.createEvidence(userType);
     }
-    public void modifyEvidence(){
+    public void updateEvidence(){
+        if (projectManagementService.evidencesProjects.size()>0) {
+            main.showText("These are the registered evidences: " + projectManagementService.getAllEvidencesNames());
+            String idEvidence = main.getInputString("\nPlease insert the name of one of them: ");
+            projectManagementService.updateEvidence(idEvidence);
+        } else {
+            main.showText("Evidences have not been registered yet :(");
+        }
     }
-    public void deleteEvidence(){
+    public void deactivateEvidence(){
+        if (projectManagementService.evidencesProjects.size()>0) {
+            main.showText("These are the registered evidences: " + projectManagementService.getAllEvidencesNames());
+            String idEvidence = main.getInputString("\nPlease insert the name of one of them: ");
+            projectManagementService.deactivateEvidence(idEvidence);
+        } else {
+            main.showText("Evidences have not been registered yet :(");
+        }
+    }
+    public void linkDataGatherersToProject(){
+        if (projectManagementService.projects.size()>0) {
+            String idProject=showSelectProjects();
+            String idDataGatherer = main.getInputString("\nPlease insert data gatherer's name: ");
+            projectManagementService.linkDataGatherersToProject(idProject,idDataGatherer);
+        } else {
+            main.showText("Projects have not been registered yet :(");
+        }
     }
     public void reviewReview(){
     }

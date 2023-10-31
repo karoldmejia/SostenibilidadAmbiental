@@ -7,37 +7,36 @@ import java.util.regex.Matcher;
 public class UserCredentialService {
 
     private Main main;
-    User[] userList;
-
-    int counterUsers = 0;
+    ArrayList<User> userList;
     private String username, password, fullname, email, phone, universityArea, position;
+    private int loggedInUserId;
     public UserCredentialService() {
         main = new Main();
-        userList = new User[100];
+        userList = new ArrayList<>();
+        loggedInUserId = -1;
+        userList.add(new Researcher("oo", "holahola", "oo oo","oo@oo.com","2020202020","oo","oo"));
+        userList.add(new DataGatherer("uu","saposapo","uu uu", "uu@uu.com","2020202020"));
     }
 
     // Sign in methods --------------------------------------------
 
     public void registerVisitor(int optUser) {
         if (optUser == 1 && registerInfo(1)) {
-            userList[counterUsers] = new Visitor(username, password);
-            counterUsers++;
+            userList.add(new Visitor(username, password));
             main.showText("Visitor account succesfully created! Now you can log in");
         }
     }
 
     public void registerDataGatherer(int optUser) {
         if (optUser == 2 && registerInfo(2)) {
-            userList[counterUsers] = new DataGatherer(username, password, fullname, email, phone);
-            counterUsers++;
+            userList.add(new DataGatherer(username, password, fullname, email, phone));
             main.showText("Data gatherer account succesfully created! Now you can log in");
         }
     }
 
     public void registerResearcher(int optUser) {
         if (optUser == 3 && registerInfo(3)) {
-            userList[counterUsers] = new Researcher(username, password, fullname, email, phone, universityArea, position);
-            counterUsers++;
+            userList.add(new Researcher(username, password, fullname, email, phone, universityArea, position));
             main.showText("Researcher account succesfully created! Now you can log in");
         }
     }
@@ -87,6 +86,7 @@ public class UserCredentialService {
         for (User user : userList) {
             if (user != null && username.equals(user.getUsername()) && password.equals(user.getPassword())) {
                 found = true;
+                loggedInUserId = user.getIdUser();
                 if (user instanceof Visitor) {
                     userType = 1;
                 }
@@ -148,6 +148,24 @@ public class UserCredentialService {
             }
         }
         return true;
+    }
+    public DataGatherer searchDataGatherer(String idDataGatherer){
+        for(User user: userList){
+            if (user!=null && user instanceof DataGatherer && user.getUsername().equals(idDataGatherer)){
+                return (DataGatherer) user;
+            }
+        }
+        main.showText("No pudimos encontrar ningún data gatherer con ese nombre :(\n");
+        return null;
+    }
+    public boolean searchDataGathererAssociated(ArrayList<DataGatherer> projectAssociates){
+        for (DataGatherer dataGatherer : projectAssociates){
+            if (dataGatherer!=null && dataGatherer.getIdUser()==loggedInUserId){
+                return true;
+            }
+        }
+        main.showText("No puedes agregar evidencias a este proyecto ya que no estás vinculado a este :(\n");
+        return false;
     }
 }
 

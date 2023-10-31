@@ -47,42 +47,27 @@ public class Main {
                 showText("\nDesea (0 para ir a inicio):\n1. Visualizar mapa de puntos de interés\n");
             }
             if (userType == 2 || userType == 3) {
-                showText("2. Crear una reseña\n");
+                showText("2. Crear una evidencia\n");
             }
             if (userType == 3) {
-                showText("3. Consultar proyecto\n4. Registrar proyecto\n5. Modificar proyecto\n6. Eliminar proyecto\n7. Registrar evidencia\n8. Modificar evidencia\n9. Desactivar evidencia\n10. Revisar reseña\n");
+                showText("3. Registrar proyecto\n4. Consultar proyecto\n5. Modificar proyecto\n6. Eliminar proyecto\n7. Modificar evidencia\n8. Desactivar evidencia\n9. Revisar reseña\n10. Link data gatherers to project\n");
             }
             optMenu = Main.txt.nextInt();
+            Main.txt.nextLine();
             if ((userType == 1 || userType == 2 || userType == 3) && optMenu == 1) {
                 controller.visualizeMap();
             } else if ((userType == 2 || userType == 3) && optMenu == 2) {
-                controller.createView();
+                controller.createEvidence(userType);
             } else if (userType == 3 && optMenu >= 3 && optMenu <= 10) {
                 switch (optMenu) {
-                    case 3:
-                        controller.seeProject();
-                        break;
-                    case 4:
-                        controller.createProject();
-                        break;
-                    case 5:
-                        controller.modifyProject();
-                        break;
-                    case 6:
-                        controller.deleteProject();
-                        break;
-                    case 7:
-                        controller.createEvidence();
-                        break;
-                    case 8:
-                        controller.modifyEvidence();
-                        break;
-                    case 9:
-                        controller.deleteEvidence();
-                        break;
-                    case 10:
-                        controller.reviewReview();
-                        break;
+                    case 3 -> controller.createProject();
+                    case 4 -> controller.seeProject();
+                    case 5 -> controller.updateProject();
+                    case 6 -> controller.deleteProject();
+                    case 7 -> controller.updateEvidence();
+                    case 8 -> controller.deactivateEvidence();
+                    case 9 -> controller.reviewReview();
+                    case 10 -> controller.reviewReview();
                 }
             } else if (optMenu == 0) {
                 showText("Redirigiendo a inicio... ");
