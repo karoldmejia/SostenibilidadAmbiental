@@ -3,8 +3,8 @@ package model;
 public class Evidence extends EvidenceProject{
     String url;
 
-    Evidence(Project project, String nameEvidence, String registerDate, boolean availability, String url) {
-        super(project, nameEvidence, registerDate, availability);
+    Evidence(String nameEvidence, String registerDate, boolean availability, String url) {
+        super(nameEvidence, registerDate, availability);
         this.url=url;
     }
 

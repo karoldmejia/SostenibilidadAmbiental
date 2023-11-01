@@ -38,19 +38,17 @@ public class Main {
             }
         }
     }
-
-
-    public void menuUser(int userType) {
+    public static void menuUser(int userType) {
         int optMenu = -1;
         while (optMenu != 0) {
             if (userType == 1 || userType == 2 || userType == 3) {
-                showText("\nDesea (0 para ir a inicio):\n1. Visualizar mapa de puntos de interés\n");
+                System.out.println("\nDesea (0 para ir a inicio):\n1. Visualizar mapa de puntos de interés\n");
             }
             if (userType == 2 || userType == 3) {
-                showText("2. Crear una evidencia\n");
+                System.out.println("2. Crear una evidencia\n");
             }
             if (userType == 3) {
-                showText("3. Registrar proyecto\n4. Consultar proyecto\n5. Modificar proyecto\n6. Eliminar proyecto\n7. Modificar evidencia\n8. Desactivar evidencia\n9. Revisar reseña\n10. Link data gatherers to project\n");
+                System.out.println("3. Registrar proyecto\n4. Consultar proyecto\n5. Modificar proyecto\n6. Eliminar proyecto\n7. Modificar evidencia\n8. Desactivar evidencia\n9. Revisar reseña\n10. Link data gatherers to project\n");
             }
             optMenu = Main.txt.nextInt();
             Main.txt.nextLine();
@@ -60,40 +58,37 @@ public class Main {
                 controller.createEvidence(userType);
             } else if (userType == 3 && optMenu >= 3 && optMenu <= 10) {
                 switch (optMenu) {
-                    case 3 -> controller.createProject();
-                    case 4 -> controller.seeProject();
-                    case 5 -> controller.updateProject();
-                    case 6 -> controller.deleteProject();
-                    case 7 -> controller.updateEvidence();
-                    case 8 -> controller.deactivateEvidence();
-                    case 9 -> controller.reviewReview();
-                    case 10 -> controller.reviewReview();
+                    case 3:
+                        controller.createProject();
+                        break;
+                    case 4:
+                        controller.seeProject();
+                        break;
+                    case 5:
+                        controller.updateProject();
+                        break;
+                    case 6:
+                        controller.deleteProject();
+                        break;
+                    case 7:
+                        controller.updateEvidence();
+                        break;
+                    case 8:
+                        controller.deactivateEvidence();
+                        break;
+                    case 9:
+                        controller.reviewEvidences();
+                        break;
+                    case 10:
+                        controller.linkDataGatherersToProject();
+                        break;
                 }
             } else if (optMenu == 0) {
-                showText("Redirigiendo a inicio... ");
+                System.out.println("Redirigiendo a inicio... ");
                 credentialUser();
             } else {
-                showText("Please, select a valid option\n");
+                System.out.println("Please, select a valid option\n");
             }
         }
-    }
-
-    public String getInputString(String input) {
-        System.out.print(input);
-        return Main.txt.nextLine();
-    }
-
-    public double getInputDouble(String input) {
-        System.out.print(input);
-        return Double.parseDouble(Main.txt.nextLine());
-    }
-
-    public int getInputInt(String input) {
-        System.out.print(input);
-        return Integer.parseInt(Main.txt.nextLine());
-    }
-
-    public void showText(String text) {
-        System.out.print(text);
     }
 }

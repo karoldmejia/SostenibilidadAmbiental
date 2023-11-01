@@ -1,12 +1,13 @@
 package model;
 
 public abstract class User {
-    int idUser=0;
+    private static int nextId = 0;
+    int idUser;
     String username;
     String password;
 
     User(String username, String password){
-        idUser+=1;
+        this.idUser = nextId++;
         this.username=username;
         this.password=password;
     }

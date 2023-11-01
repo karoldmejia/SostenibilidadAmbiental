@@ -2,23 +2,22 @@ package model;
 import java.util.*;
 import ui.Main;
 
-public class Controller {
-    private Main main;
+public class Controller{
     private UserCredentialService userCredentialService;
     private ProjectManagementService projectManagementService;
     public Controller(){
-        main=new Main();
-        userCredentialService=new UserCredentialService();
-        projectManagementService=new ProjectManagementService();
-
+        this.userCredentialService=new UserCredentialService();
+        this.projectManagementService=new ProjectManagementService();
+        userCredentialService.initializeUsers();
+        projectManagementService.initializeProjects();
     }
 
     public void registerUser() {
         int optUser = -1;
         while (optUser < 1 || optUser > 3) {
-            optUser = main.getInputInt("Please, select which user you want to create: \n1. Visitor \n2. Data gatherer \n3. Researcher\n");
+            optUser = UserInteraction.getInputInt("Please, select which user you want to create: \n1. Visitor \n2. Data gatherer \n3. Researcher\n");
             if (optUser < 1 || optUser > 3) {
-                main.showText("Por favor, selecciona una opción válida (1, 2 o 3).");
+                UserInteraction.showText("Por favor, selecciona una opción válida (1, 2 o 3).");
             }
         }
         if (optUser==1){
@@ -31,9 +30,9 @@ public class Controller {
     }
 
     public void loginUser(){
-        main.showText("Log in!\n");
-        String username=main.getInputString("Please, enter your name: ");
-        String password=main.getInputString("Now your password: ");
+        UserInteraction.showText("Log in!\n");
+        String username=UserInteraction.getInputString("Please, enter your name: ");
+        String password=UserInteraction.getInputString("Now your password: ");
         userCredentialService.loginUser(username,password);
     }
 
@@ -43,8 +42,8 @@ public class Controller {
     }
 
     private String showSelectProjects(){
-        main.showText("These are the registered projects: " + projectManagementService.getAllProjectsNames());
-        String idProject = main.getInputString("\nPlease insert the name of one of them: ");
+        UserInteraction.showText("These are the registered projects: " + projectManagementService.getAllProjectsNames());
+        String idProject = UserInteraction.getInputString("\nPlease insert the name of one of them: ");
         return idProject;
     }
     public void createProject(){
@@ -55,7 +54,7 @@ public class Controller {
             String idProject=showSelectProjects();
             projectManagementService.queryProject(idProject);
         } else {
-            main.showText("Projects have not been registered yet :(");
+            UserInteraction.showText("Projects have not been registered yet :(");
         }
     }
     public void updateProject(){
@@ -63,54 +62,88 @@ public class Controller {
             String idProject=showSelectProjects();
             projectManagementService.updateProject(idProject);
         } else {
-            main.showText("Projects have not been registered yet :(");
+            UserInteraction.showText("Projects have not been registered yet :(");
         }
     }
     public void deleteProject(){
         if (projectManagementService.projects.size()>0) {
             String idProject=showSelectProjects();
-            String checkDecision=main.getInputString("¿Está usted seguro que desea eliminar el proyecto? Press 'si' or any other letter for otherwise\n");
+            String checkDecision=UserInteraction.getInputString("¿Está usted seguro que desea eliminar el proyecto? Press 'si' or any other letter for otherwise\n");
             if (checkDecision.equalsIgnoreCase("si")){
                 projectManagementService.deleteProject(idProject);
             } else {
-                main.showText("Okey, let's get back to the menu!\n");
+                UserInteraction.showText("Okey, let's get back to the menu!\n");
             }
         } else {
-            main.showText("Projects have not been registered yet :(");
+            UserInteraction.showText("Projects have not been registered yet :(");
         }
     }
     public void createEvidence(int userType){
-        projectManagementService.createEvidence(userType);
-    }
-    public void updateEvidence(){
-        if (projectManagementService.evidencesProjects.size()>0) {
-            main.showText("These are the registered evidences: " + projectManagementService.getAllEvidencesNames());
-            String idEvidence = main.getInputString("\nPlease insert the name of one of them: ");
-            projectManagementService.updateEvidence(idEvidence);
+        if (!projectManagementService.projects.isEmpty()) {
+            String idProject=showSelectProjects();
+            Project project=projectManagementService.searchProject(idProject);
+            if (project!=null){
+                project.createEvidence(userType);
+            }
         } else {
-            main.showText("Evidences have not been registered yet :(");
+            UserInteraction.showText("Projects have not been registered yet :(");
         }
     }
-    public void deactivateEvidence(){
-        if (projectManagementService.evidencesProjects.size()>0) {
-            main.showText("These are the registered evidences: " + projectManagementService.getAllEvidencesNames());
-            String idEvidence = main.getInputString("\nPlease insert the name of one of them: ");
-            projectManagementService.deactivateEvidence(idEvidence);
+    public void updateEvidence() {
+        if (!projectManagementService.projects.isEmpty()) {
+            String idProject = showSelectProjects();
+            Project project = projectManagementService.searchProject(idProject);
+            if (project != null) {
+                if (!project.evidences.isEmpty()) {
+                    UserInteraction.showText("These are the registered evidences: " + project.getAllEvidencesNames());
+                    String idEvidence = UserInteraction.getInputString("\nPlease insert the name of one of them: ");
+                    project.updateEvidence(idEvidence);
+                } else {
+                    UserInteraction.showText("Evidences have not been registered yet :(");
+                }
+            }
         } else {
-            main.showText("Evidences have not been registered yet :(");
+            UserInteraction.showText("Projects have not been registered yet :(");
+        }
+    }
+
+    public void deactivateEvidence(){
+        if (!projectManagementService.projects.isEmpty()) {
+            String idProject = showSelectProjects();
+            Project project = projectManagementService.searchProject(idProject);
+            if (project != null) {
+                if (!project.evidences.isEmpty()) {
+                    UserInteraction.showText("These are the registered evidences: " + project.getAllEvidencesNames());
+                    String idEvidence = UserInteraction.getInputString("\nPlease insert the name of one of them: ");
+                    project.deactivateEvidence(idEvidence);
+                } else {
+                    UserInteraction.showText("Evidences have not been registered yet :(");
+                }
+            }
+        } else {
+            UserInteraction.showText("Projects have not been registered yet :(");
         }
     }
     public void linkDataGatherersToProject(){
-        if (projectManagementService.projects.size()>0) {
+        if (!projectManagementService.projects.isEmpty()) {
             String idProject=showSelectProjects();
-            String idDataGatherer = main.getInputString("\nPlease insert data gatherer's name: ");
+            String idDataGatherer = UserInteraction.getInputString("Please insert data gatherer's name: ");
             projectManagementService.linkDataGatherersToProject(idProject,idDataGatherer);
         } else {
-            main.showText("Projects have not been registered yet :(");
+            UserInteraction.showText("Projects have not been registered yet :(");
         }
     }
-    public void reviewReview(){
+    public void reviewEvidences(){
+        if (!projectManagementService.projects.isEmpty()) {
+            UserInteraction.showText("Elige un proyecto para revisar sus reviews\n");
+            String idProject=showSelectProjects();
+            Project project=projectManagementService.searchProject(idProject);
+            if (project!=null){
+                project.reviewReviews();
+            }
+        } else {
+            UserInteraction.showText("Projects have not been registered yet :(");
+        }
     }
-
 
 }

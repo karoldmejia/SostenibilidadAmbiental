@@ -1,24 +1,24 @@
 package model;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class Project {
-    int idProject=0;
-    String nameProject;
-    String description;
+public class Project{
+    private static int nextId = 1;
+    int idProject;
+    String nameProject, description, initialDate, finalDate;
     ArrayList<DataGatherer> associatedDataGatherers;
-    int dataGatherersCounter;
     Pilar pilar;
-    String initialDate;
-    String finalDate;
     boolean status;
+    ArrayList<EvidenceProject> evidences;
 
     Project(String nameProject,String description,Pilar pilar,String initialDate,String finalDate,boolean status){
-        idProject+=1;
+        idProject=nextId++;
         this.nameProject=nameProject;
         this.description=description;
-        associatedDataGatherers = new ArrayList<>();
-        this.dataGatherersCounter=0;
+        this.associatedDataGatherers = new ArrayList<>();
+        this.evidences = new ArrayList<>();
         this.pilar=pilar;
         this.initialDate=initialDate;
         this.finalDate=finalDate;
@@ -26,10 +26,6 @@ public class Project {
     }
 
     // Getters
-    public int getIdProject() {
-        return idProject;
-    }
-
     public String getNameProject() {
         return nameProject;
     }
@@ -83,4 +79,254 @@ public class Project {
     public void setStatus(boolean status) {
         this.status = status;
     }
+
+    // Evidences methods
+    // Main methods ---------------------------------------------------
+
+    protected void createEvidence(int userType){
+        boolean flag=false;
+        int optEvidence=0;
+        String nameEvidence=null, registerDate=null;
+        if (userType==3) {
+            optEvidence = UserInteraction.getInputInt("Desea añadir:\n1. Reseña\n2. Evidencia común\n");
+        } else if (userType==2) {
+            optEvidence=1;
+            if (!(UserCredentialService.searchDataGathererAssociated(getAssociatedDataGatherers()))){
+                return;
+            }
+        }
+        while (!flag){
+            nameEvidence= UserInteraction.getInputString("Ingresa el nombre: ");
+            registerDate = UserInteraction.getInputString("Enter the registration date: ");
+            if (isNameValid(nameEvidence) && isDateValid(registerDate) && getStatus()){
+                flag=true;
+            } else if (!getStatus()) {
+                UserInteraction.showText("Lo siento, no puedes agregar evidencias a este proyecto ya que no se encuentra disponible\n");
+                return;
+            }
+        }
+        if (flag) {
+            if ((userType == 2 || userType == 3) && optEvidence == 1) {
+                createReview(nameEvidence, registerDate, userType);
+            } else if (userType == 3 && optEvidence == 2) {
+                createCommonEvidence(nameEvidence, registerDate);
+            }
+        }
+    }
+
+    private void createReview(String nameEvidence, String registerDate, int userType){
+        boolean evidenceStatus=false;
+        int cantUrl=UserInteraction.getInputInt("¿Cuántos enlaces desea agregar?: ");
+        String[] listUrl=new String[cantUrl];
+        if (userType==3) {
+            evidenceStatus=true;
+        }
+        for (int i=0;i<cantUrl;i++){
+            listUrl[i]=UserInteraction.getInputString("Evidence no. "+(i+1)+": ");
+        }
+        evidences.add(new Review(nameEvidence,registerDate,true,evidenceStatus,listUrl));
+        if (!evidenceStatus){
+            UserInteraction.showText("Creación exitosa, ahora tu reseña se encuentra pendiente por aprobación!\n");
+        } else {
+            UserInteraction.showText("Reseña creada exitosamente!\n");
+        }
+    }
+    private void createCommonEvidence(String nameEvidence, String registerDate){
+        String url= UserInteraction.getInputString("Ingresa la url: ");
+        if (url!=null){
+            evidences.add(new Evidence(nameEvidence,registerDate,true,url));
+            UserInteraction.showText("Evidencia creada exitosamente!\n");
+        } else{
+            UserInteraction.showText("Url no puede estar vacía!\n");
+        }
+    }
+
+    void updateEvidence(String idEvidence){
+        EvidenceProject evidence=searchEvidence(idEvidence);
+        if (evidence == null) {
+            return;
+        }
+        while (true) {
+            UserInteraction.showText("Select the attribute to modify: \n1. Name\n2. Registration date\n");
+            if (evidence instanceof Evidence){
+                UserInteraction.showText("4. Url\n");
+            } else if (evidence instanceof Review) {
+                UserInteraction.showText("4. Url from list\n");
+            }
+            int opcion = UserInteraction.getInputInt("\nEnter the number of the desired option (0 to finish and apply changes): ");
+            if (opcion == 0) {
+                break;
+            }
+            switch (opcion) {
+                case 1:
+                    updateNameEvidence(evidence);
+                    break;
+                case 2:
+                    updateDateEvidence(evidence);
+                    break;
+            }
+            if (evidence instanceof Evidence && opcion==4){
+                updateSingleUrl(evidence);
+            } else if (evidence instanceof Review && opcion==4) {
+                updateMultipleUrl(evidence);
+            } else {
+                UserInteraction.showText("Invalid option.");
+            }
+        }
+        UserInteraction.showText("Changes applied successfully.");
+    }
+    protected void deactivateEvidence(String idEvidence){
+        EvidenceProject evidenceDelete=searchEvidence(idEvidence);
+        if (evidenceDelete!=null) {
+            evidenceDelete.setAvailability(false);
+            UserInteraction.showText("Evidencia desactivada.");
+            return;
+        }
+        UserInteraction.showText("We couldn't find any project");
+    }
+    protected void reviewReviews() {
+        ArrayList<Review> unreviewedReviews = new ArrayList<>();
+        for (EvidenceProject evidence : evidences) {
+            if (evidence instanceof Review && !((Review) evidence).getEvidenceStatus()) {
+                unreviewedReviews.add((Review) evidence);
+            }
+        }
+        if (unreviewedReviews.isEmpty()) {
+            UserInteraction.showText("No se encontró ninguna review pendiente por revisión :)\n");
+            return;
+        }
+        UserInteraction.showText("Por favor, elige la review que desees revisar, o 0 para salir:\n");
+        int optReview = -1;
+        while (optReview != 0) {
+            for (int i = 0; i < unreviewedReviews.size(); i++) {
+                UserInteraction.showText((i + 1) + ". " + unreviewedReviews.get(i).getNameEvidence()+"\n");
+            }
+            optReview = UserInteraction.getInputInt("Ingresa tu opción: ");
+            if (optReview == 0) {
+                break;
+            }
+            if (optReview < 1 || optReview > unreviewedReviews.size()) {
+                UserInteraction.showText("Opción inválida. Por favor, elige una opción válida.\n");
+            } else {
+                Review selectedReview = unreviewedReviews.get(optReview - 1);
+                int markReview = UserInteraction.getInputInt("¿Desea?\n1. Aprobar\n2. Desaprobar\nIngresa tu opción: ");
+                if (markReview == 1) {
+                    selectedReview.setEvidenceStatus(true);
+                    unreviewedReviews.remove(selectedReview);
+                    UserInteraction.showText("Review aprobada!\n");
+                } else if (markReview == 2) {
+                    evidences.remove(selectedReview);
+                    unreviewedReviews.remove(selectedReview);
+                    UserInteraction.showText("Review desaprobada!\n");
+                } else {
+                    UserInteraction.showText("Opción inválida. Por favor, elige 1 o 2.\n");
+                }
+            }
+        }
+    }
+
+    // Main methods ---------------------------------------------------
+    private EvidenceProject searchEvidence(String idEvidence) {
+        for (EvidenceProject evidenceProject : evidences) {
+            if (evidenceProject!=null && idEvidence.equals(evidenceProject.getNameEvidence())) {
+                return evidenceProject;
+            }
+        }
+        UserInteraction.showText("We couldn't find any evidence with that name :(\n");
+        return null;
+    }
+    private boolean isNameValid(String nameProject) {
+        boolean flag=false;
+        for (EvidenceProject evidenceProject : evidences) {
+            if (evidenceProject != null && nameProject.equals(evidenceProject.getNameEvidence())) {
+                flag=true;
+            }
+        }
+        if (flag){
+            UserInteraction.showText("Sorry, entered name is already registered. Please, select a different username.\n");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    private boolean isDateValid(String date) {
+        boolean flag;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        dateFormat.setLenient(false);
+        try {
+            Date parsedDate = dateFormat.parse(date);
+            flag= date.equals(dateFormat.format(parsedDate));
+        } catch (ParseException e) {
+            flag=false;
+        }
+        if (flag){
+            return true;
+        } else {
+            UserInteraction.showText("El formato de fecha ingresado no es válido\n");
+            return false;
+        }
+    }
+    void updateNameEvidence(EvidenceProject evidenceProject){
+        String name = UserInteraction.getInputString("Enter the new name: ");
+        if (isNameValid(name)) {
+            evidenceProject.setNameEvidence(name);
+        }
+    }
+    private void updateDateEvidence(EvidenceProject evidenceProject){
+        String date = UserInteraction.getInputString("Enter the new registration date: ");
+        if (isDateValid(date)) {
+            evidenceProject.setRegisterDate(date);
+        }
+    }
+    private void updateSingleUrl(EvidenceProject evidenceProject){
+        String url = UserInteraction.getInputString("Enter the new url: ");
+        Evidence evidence = (Evidence) evidenceProject;
+        evidence.setUrl(url);
+    }
+    private void updateMultipleUrl(EvidenceProject evidenceProject){
+        Review review=(Review) evidenceProject;
+        int optUrl=-1;
+        while (optUrl!=0) {
+            UserInteraction.showText("Por favor, elija cuál url desea cambiar\n");
+            for (int i = 0; i < review.getListUrl().length; i++) {
+                UserInteraction.showText((i+1) + ". " + review.getListUrl()[i]+"\n");
+            }
+            optUrl = UserInteraction.getInputInt("Ingrese su elección o '0' para salir: ");
+            if (optUrl>=1 && optUrl<=review.getListUrl().length){
+                review.getListUrl()[(optUrl-1)] = UserInteraction.getInputString("Enter new url: ");
+            } else {
+                UserInteraction.showText("Ingresa una opción válida");
+            }
+        }
+    }
+    protected int[] countEvidences(){
+        int[] cantEvidencesProject=new int[2];
+        int cEvidences=0;
+        int cReviews=0;
+        for (EvidenceProject evidence: evidences) {
+            if (evidence !=null && evidence.getAvailability() ){
+                if (evidence instanceof Evidence){
+                    cEvidences++;
+                } else if (evidence instanceof Review && ((Review) evidence).getEvidenceStatus()) {
+                    cReviews++;
+                }
+            }
+        }
+        cantEvidencesProject[0]=cEvidences;
+        cantEvidencesProject[1]=cReviews;
+        return cantEvidencesProject;
+    }
+    protected String getAllEvidencesNames() {
+        StringBuilder evidencesNames = new StringBuilder();
+        for (int i = 0; i < evidences.size(); i++) {
+            EvidenceProject evidenceProject = evidences.get(i);
+            String name = evidenceProject.getNameEvidence();
+            evidencesNames.append(name);
+            if (i < evidences.size() - 1) {
+                evidencesNames.append(", ");
+            }
+        }
+        return evidencesNames.toString();
+    }
+
 }
