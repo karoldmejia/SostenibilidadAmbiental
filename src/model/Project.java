@@ -83,6 +83,8 @@ public class Project{
     // Evidences methods
     // Main methods ---------------------------------------------------
 
+    String typeEvidenceOpt= "Please, select evidence's type:\n1. Audio (A)\n2. Video (V)\n3. Photo (P)\n4. Text (T)\n5. Results report (RR)\n";
+
     protected void createEvidence(int userType){
         boolean flag=false;
         int optEvidence=0;
@@ -124,7 +126,11 @@ public class Project{
         for (int i=0;i<cantUrl;i++){
             listUrl[i]=UserInteraction.getInputString("Evidence no. "+(i+1)+": ");
         }
-        evidences.add(new Review(nameEvidence,registerDate,true,evidenceStatus,listUrl));
+        CharTypeEvidence typeEvidence=CharTypeEvidence.R;
+        evidences.add(new Review(nameEvidence, registerDate, true, typeEvidence, evidenceStatus, listUrl));
+        int lastIndex = evidences.size() - 1;
+        EvidenceProject lastEvidence = evidences.get(lastIndex);
+        linkInterestPoint(lastEvidence);
         if (!evidenceStatus){
             UserInteraction.showText("Creación exitosa, ahora tu reseña se encuentra pendiente por aprobación!\n");
         } else {
@@ -133,11 +139,14 @@ public class Project{
     }
     private void createCommonEvidence(String nameEvidence, String registerDate){
         String url= UserInteraction.getInputString("Ingresa la url: ");
-        if (url!=null){
-            evidences.add(new Evidence(nameEvidence,registerDate,true,url));
+        int charTypeEvidence=UserInteraction.getInputInt(typeEvidenceOpt);
+        CharTypeEvidence typeEvidence=selectTypeEvidence(charTypeEvidence);
+        if (typeEvidence!=null){
+            evidences.add(new Evidence(nameEvidence,registerDate,true,typeEvidence,url));
+            int lastIndex = evidences.size() - 1;
+            EvidenceProject lastEvidence = evidences.get(lastIndex);
+            linkInterestPoint(lastEvidence);
             UserInteraction.showText("Evidencia creada exitosamente!\n");
-        } else{
-            UserInteraction.showText("Url no puede estar vacía!\n");
         }
     }
 
@@ -266,6 +275,24 @@ public class Project{
             return false;
         }
     }
+    private CharTypeEvidence selectTypeEvidence(int typeEvidenceId){
+        CharTypeEvidence typeEvidence;
+        if (typeEvidenceId==1) {
+            typeEvidence = CharTypeEvidence.A;
+        } else if (typeEvidenceId==2) {
+            typeEvidence = CharTypeEvidence.V;
+        } else if (typeEvidenceId==3) {
+            typeEvidence = CharTypeEvidence.P;
+        } else if (typeEvidenceId==4) {
+            typeEvidence = CharTypeEvidence.T;
+        } else if (typeEvidenceId==5) {
+        typeEvidence = CharTypeEvidence.RR;
+        } else {
+            UserInteraction.showText("La opción ingresada no es válida\n");
+            return null;
+        }
+        return typeEvidence;
+    }
     void updateNameEvidence(EvidenceProject evidenceProject){
         String name = UserInteraction.getInputString("Enter the new name: ");
         if (isNameValid(name)) {
@@ -327,6 +354,23 @@ public class Project{
             }
         }
         return evidencesNames.toString();
+    }
+
+    private void linkInterestPoint(EvidenceProject evidence){
+        String addInterestPoint = UserInteraction.getInputString("¿Deseas vincular un punto de interés a la evidencia? Ingresa 'y' para afirmar, y cualquier otra letra para cancelar\n");
+        if (addInterestPoint.equalsIgnoreCase("y")) {
+            int axisX = UserInteraction.getInputInt("Ingresa la coordenada x: ");
+            int axisY = UserInteraction.getInputInt("Ingresa la coordenada y: ");
+            InterestPoint point = MapUniversity.getInterestPoint(axisX,axisY);
+            if (point == null) {
+                String nombrePunto = UserInteraction.getInputString("Ingresa el nombre del punto de interés: ");
+                String codeQR = UserInteraction.getInputString("Ingresa el código QR del punto de interés: ");
+                point = new InterestPoint(nombrePunto, axisX, axisY, codeQR);
+                MapUniversity.addInterestPoint(point);
+            }
+            point.addEvidence(evidence);
+            UserInteraction.showText("Evidencia asociada al punto de interés exitosamente!\n");
+        }
     }
 
 }

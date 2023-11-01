@@ -4,8 +4,8 @@ public class Review extends EvidenceProject{
 
     boolean evidenceStatus;
     String[] listUrl;
-    Review(String nameEvidence, String registerDate, boolean availability, boolean evidenceStatus, String[] listUrl) {
-        super(nameEvidence, registerDate, availability);
+    Review(String nameEvidence, String registerDate, boolean availability, CharTypeEvidence typeEvidence, boolean evidenceStatus, String[] listUrl) {
+        super(nameEvidence, registerDate, availability, typeEvidence);
         this.evidenceStatus=evidenceStatus;
         this.listUrl=listUrl;
     }

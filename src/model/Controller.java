@@ -37,8 +37,8 @@ public class Controller{
     }
 
     public void visualizeMap(){
-    }
-    public void createView(){
+        MapUniversity.showMap();
+
     }
 
     private String showSelectProjects(){
