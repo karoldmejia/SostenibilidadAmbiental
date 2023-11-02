@@ -23,6 +23,9 @@ public abstract class EvidenceProject {
     public boolean getAvailability(){
         return availability;
     }
+    public CharTypeEvidence getTypeEvidence() {
+        return typeEvidence;
+    }
 
     // Setters
     public void setNameEvidence(String nameEvidence) {

@@ -3,6 +3,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 public class Project{
     private static int nextId = 1;
@@ -52,7 +53,9 @@ public class Project{
     public boolean getStatus() {
         return status;
     }
-
+    public ArrayList<EvidenceProject> getEvidences() {
+        return evidences;
+    }
     // Setters
 
 
@@ -84,7 +87,6 @@ public class Project{
     // Main methods ---------------------------------------------------
 
     String typeEvidenceOpt= "Please, select evidence's type:\n1. Audio (A)\n2. Video (V)\n3. Photo (P)\n4. Text (T)\n5. Results report (RR)\n";
-
     protected void createEvidence(int userType){
         boolean flag=false;
         int optEvidence=0;
@@ -184,14 +186,21 @@ public class Project{
         }
         UserInteraction.showText("Changes applied successfully.");
     }
-    protected void deactivateEvidence(String idEvidence){
-        EvidenceProject evidenceDelete=searchEvidence(idEvidence);
-        if (evidenceDelete!=null) {
-            evidenceDelete.setAvailability(false);
-            UserInteraction.showText("Evidencia desactivada.");
-            return;
+    protected void ActivateDeactivateEvidence(String idEvidence){
+        EvidenceProject evidence=searchEvidence(idEvidence);
+        if (evidence!=null) {
+            if (evidence.getAvailability()){
+                evidence.setAvailability(false);
+                UserInteraction.showText("Evidencia desactivada.");
+                return;
+            } else{
+                evidence.setAvailability(true);
+                UserInteraction.showText("Evidencia desactivada.");
+                return;
+            }
+
         }
-        UserInteraction.showText("We couldn't find any project");
+        UserInteraction.showText("We couldn't find any evidence");
     }
     protected void reviewReviews() {
         ArrayList<Review> unreviewedReviews = new ArrayList<>();

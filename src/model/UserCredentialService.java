@@ -11,6 +11,7 @@ public class UserCredentialService{
     private String username, password, fullname, email, phone, universityArea, position;
 
     protected void initializeUsers() {
+        userList.add(new Visitor("dd","monomono"));
         userList.add(new DataGatherer("oo", "holahola", "oo oo", "oo@oo.com", "2020202020"));
         userList.add(new Researcher("uu", "saposapo", "uu uu", "uu@uu.com", "2020202020","uu","uu"));
     }

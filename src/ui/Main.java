@@ -42,13 +42,13 @@ public class Main {
         int optMenu = -1;
         while (optMenu != 0) {
             if (userType == 1 || userType == 2 || userType == 3) {
-                System.out.println("\nDesea (0 para ir a inicio):\n1. Visualizar mapa de puntos de interés\n");
+                System.out.println("\nDesea (0 para ir a inicio):\n1. Visualizar mapa de puntos de interés");
             }
             if (userType == 2 || userType == 3) {
-                System.out.println("2. Crear una evidencia\n");
+                System.out.println("2. Crear una evidencia");
             }
             if (userType == 3) {
-                System.out.println("3. Registrar proyecto\n4. Consultar proyecto\n5. Modificar proyecto\n6. Eliminar proyecto\n7. Modificar evidencia\n8. Desactivar evidencia\n9. Revisar reseña\n10. Link data gatherers to project\n");
+                System.out.println("3. Modificar evidencia\n4. Activar o desactivar evidencia\n5. Registrar proyecto\n6. Consultar proyecto\n7. Modificar proyecto\n8. Eliminar proyecto\n9. Revisar reseña\n10. Link data gatherers to project\n11. Modificar puntos de interés\n12. Eliminar puntos de interés");
             }
             optMenu = Main.txt.nextInt();
             Main.txt.nextLine();
@@ -56,31 +56,37 @@ public class Main {
                 controller.visualizeMap();
             } else if ((userType == 2 || userType == 3) && optMenu == 2) {
                 controller.createEvidence(userType);
-            } else if (userType == 3 && optMenu >= 3 && optMenu <= 10) {
+            } else if (userType == 3 && optMenu >= 3 && optMenu <= 12) {
                 switch (optMenu) {
                     case 3:
-                        controller.createProject();
-                        break;
-                    case 4:
-                        controller.seeProject();
-                        break;
-                    case 5:
-                        controller.updateProject();
-                        break;
-                    case 6:
-                        controller.deleteProject();
-                        break;
-                    case 7:
                         controller.updateEvidence();
                         break;
-                    case 8:
+                    case 4:
                         controller.deactivateEvidence();
+                        break;
+                    case 5:
+                        controller.createProject();
+                        break;
+                    case 6:
+                        controller.seeProject();
+                        break;
+                    case 7:
+                        controller.updateProject();
+                        break;
+                    case 8:
+                        controller.deleteProject();
                         break;
                     case 9:
                         controller.reviewEvidences();
                         break;
                     case 10:
                         controller.linkDataGatherersToProject();
+                        break;
+                    case 11:
+                        controller.deleteInterestPoint();
+                        break;
+                    case 12:
+                        controller.deleteInterestPoint();
                         break;
                 }
             } else if (optMenu == 0) {

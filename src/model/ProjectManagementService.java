@@ -9,6 +9,15 @@ public class ProjectManagementService{
 
     protected void initializeProjects() {
         projects.add(new Project("uu", "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu", Pilar.Biodiversidad, "01/01/2001", "01/01/2002", true));
+        projects.get(0).getEvidences().add(new Evidence("pp","01/01/2001",true,CharTypeEvidence.A,"ww"));
+        String[] list=new String[2];
+        list[0]="ww";
+        list[1]="ww";
+        projects.get(0).getEvidences().add(new Review("dd","01/01/2001",true,CharTypeEvidence.R,false,list));
+        InterestPoint interestPoint=new InterestPoint("qq",12,12,"eoiroir");
+        interestPoint.getEvidences().add(projects.get(0).getEvidences().get(0));
+        interestPoint.getEvidences().add(projects.get(0).getEvidences().get(1));
+        MapUniversity.addInterestPoint(interestPoint);
     }
 
     // Main methods --------------------------------------------

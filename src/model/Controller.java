@@ -1,6 +1,6 @@
 package model;
-import java.util.*;
-import ui.Main;
+
+import java.util.Map;
 
 public class Controller{
     private UserCredentialService userCredentialService;
@@ -11,6 +11,7 @@ public class Controller{
         userCredentialService.initializeUsers();
         projectManagementService.initializeProjects();
     }
+
 
     public void registerUser() {
         int optUser = -1;
@@ -115,7 +116,7 @@ public class Controller{
                 if (!project.evidences.isEmpty()) {
                     UserInteraction.showText("These are the registered evidences: " + project.getAllEvidencesNames());
                     String idEvidence = UserInteraction.getInputString("\nPlease insert the name of one of them: ");
-                    project.deactivateEvidence(idEvidence);
+                    project.ActivateDeactivateEvidence(idEvidence);
                 } else {
                     UserInteraction.showText("Evidences have not been registered yet :(");
                 }
@@ -143,6 +144,17 @@ public class Controller{
             }
         } else {
             UserInteraction.showText("Projects have not been registered yet :(");
+        }
+    }
+
+    public void deleteInterestPoint() {
+        UserInteraction.showText("These are the registered evidences: " + MapUniversity.getAllPointsNames());
+        String idPoint = UserInteraction.getInputString("\nPlease insert the name of one of them: ");
+        String checkDecision = UserInteraction.getInputString("¿Está usted seguro que desea eliminar el punto de interés? Press 'si' or any other letter for otherwise\n");
+        if (checkDecision.equalsIgnoreCase("si")) {
+            MapUniversity.deletePoint(idPoint);
+        } else {
+            UserInteraction.showText("Okey, let's get back to the menu!\n");
         }
     }
 
