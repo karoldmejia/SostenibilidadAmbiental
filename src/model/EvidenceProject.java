@@ -1,6 +1,4 @@
 package model;
-import java.util.ArrayList;
-
 public abstract class EvidenceProject {
     int idEvidence=0;
     String nameEvidence;
@@ -17,9 +15,19 @@ public abstract class EvidenceProject {
     }
 
     // Getters
+
+    public int getIdEvidence() {
+        return idEvidence;
+    }
+
     public String getNameEvidence() {
         return nameEvidence;
     }
+
+    public String getRegisterDate() {
+        return registerDate;
+    }
+
     public boolean getAvailability(){
         return availability;
     }

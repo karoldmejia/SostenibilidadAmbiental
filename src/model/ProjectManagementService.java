@@ -5,7 +5,7 @@ import java.util.Date;
 import java.text.ParseException;
 
 public class ProjectManagementService{
-    ArrayList<Project> projects = new ArrayList<>();
+    static ArrayList<Project> projects = new ArrayList<>();
 
     protected void initializeProjects() {
         projects.add(new Project("uu", "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu", Pilar.Biodiversidad, "01/01/2001", "01/01/2002", true));
@@ -22,7 +22,7 @@ public class ProjectManagementService{
 
     // Main methods --------------------------------------------
 
-    String pilarOptions= "Please, select which pilar this project belongs to:\n1. Biodiversidad\n2. Gestión del recurso hídrico\n3. Gestión integral de residuos sólidos\n4. Energía";
+    String pilarOptions= "Please, select which pilar this project belongs to:\n1. Biodiversidad\n2. Gestión del recurso hídrico\n3. Gestión integral de residuos sólidos\n4. Energía\n";
     String statusOptions="Please insert 'y' if this project is available, and any other letter for otherwise\n";
     public void createProject() {
         boolean flag = false;
@@ -120,7 +120,7 @@ public class ProjectManagementService{
     }
 
     // Support methods --------------------------------------------
-    protected boolean isNameValid(String nameProject) {
+    private boolean isNameValid(String nameProject) {
         boolean flag=false;
         for (Project project : projects) {
             if (project != null && nameProject.equals(project.getNameProject())) {
@@ -159,7 +159,7 @@ public class ProjectManagementService{
         }
         return pilar;
     }
-    boolean isDateValid(String date) {
+    private boolean isDateValid(String date) {
         boolean flag;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         dateFormat.setLenient(false);
@@ -254,4 +254,23 @@ public class ProjectManagementService{
         boolean status = checkStatus(idStatus);
         project.setStatus(status);
     }
+    protected static String findEvidenceProject(EvidenceProject evidenceProject) {
+        String nameProject=null;
+        for (Project project : projects) {
+            for (EvidenceProject evidence : project.getEvidences()) {
+                if (evidence.getIdEvidence() == evidenceProject.getIdEvidence()) {
+                    nameProject=project.getNameProject();
+                    break;
+                }
+            }
+        }
+
+        if (nameProject!=null){
+            return nameProject;
+        } else {
+            return null;
+        }
+    }
+
+
 }

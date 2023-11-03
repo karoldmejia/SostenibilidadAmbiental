@@ -83,7 +83,7 @@ public class Main {
                         controller.linkDataGatherersToProject();
                         break;
                     case 11:
-                        controller.deleteInterestPoint();
+                        controller.updateInterestPoint();
                         break;
                     case 12:
                         controller.deleteInterestPoint();

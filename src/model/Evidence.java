@@ -7,6 +7,12 @@ public class Evidence extends EvidenceProject{
         super(nameEvidence, registerDate, availability, typeEvidence);
         this.url=url;
     }
+    // Getters
+
+    public String getUrl() {
+        return url;
+    }
+
 
     // Setters
 

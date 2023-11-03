@@ -1,7 +1,4 @@
 package model;
-
-import java.util.Map;
-
 public class Controller{
     private UserCredentialService userCredentialService;
     private ProjectManagementService projectManagementService;
@@ -37,10 +34,75 @@ public class Controller{
         userCredentialService.loginUser(username,password);
     }
 
-    public void visualizeMap(){
-        MapUniversity.showMap();
+    public void visualizeMap() {
+        int filterOption = UserInteraction.getInputInt("You wish to filter... \n1. Pillars\n2. Projects\n");
 
+        if (filterOption == 1) {
+            filterByPillar();
+        } else if (filterOption == 2) {
+            filterByProject();
+        } else {
+            UserInteraction.showText("Invalid option :(\n");
+        }
+
+        String checkDecision = "o";
+        while (checkDecision != "y") {
+            checkDecision = UserInteraction.getInputString("¿Desea consultar algún punto de interés? Press 'y' or any other letter for otherwise\n");
+            if (checkDecision.equalsIgnoreCase("y")) {
+                int x = UserInteraction.getInputInt("Insert coordinate x: ");
+                int y = UserInteraction.getInputInt("Insert coordinate y: ");
+                MapUniversity.showPoint(x, y);
+            } else {
+                break;
+            }
+        }
     }
+
+    private void filterByPillar() {
+        int pillarOpt = UserInteraction.getInputInt("Select a pillar: \n1. Biodiversidad\n2. Gestión del recurso hídrico\n3. Gestión integral de residuos sólidos\n4. Energía\n");
+        Pilar pillar = null;
+
+        switch (pillarOpt) {
+            case 1:
+                pillar = Pilar.Biodiversidad;
+                break;
+            case 2:
+                pillar = Pilar.Gestion_del_recurso_hidrico;
+                break;
+            case 3:
+                pillar = Pilar.Gestion_integral_de_residuos_solidos;
+                break;
+            case 4:
+                pillar = Pilar.Energia;
+                break;
+            default:
+                UserInteraction.showText("Invalid option :(\n");
+                return;
+        }
+        boolean projectFound = false;
+        for (Project project : projectManagementService.projects) {
+            if (project.getPilar() == pillar) {
+                MapUniversity.showMap(project);
+                projectFound = true;
+            }
+        }
+        if (!projectFound) {
+            UserInteraction.showText("No projects found for the selected pillar :(\n");
+        }
+    }
+
+    private void filterByProject() {
+        if (projectManagementService.projects.isEmpty()) {
+            UserInteraction.showText("Projects have not been registered yet :(\n");
+            return;
+        }
+        String idProject = showSelectProjects();
+        Project project = projectManagementService.searchProject(idProject);
+        if (project != null) {
+            MapUniversity.showMap(project);
+        }
+    }
+
 
     private String showSelectProjects(){
         UserInteraction.showText("These are the registered projects: " + projectManagementService.getAllProjectsNames());
@@ -147,15 +209,24 @@ public class Controller{
         }
     }
 
+    public void updateInterestPoint() {
+        UserInteraction.showText("Please insert point's location\n");
+        int x=UserInteraction.getInputInt("Insert coordinate x: ");
+        int y=UserInteraction.getInputInt("Insert coordinate y: ");
+        MapUniversity.updatePoint(x,y);
+    }
+
     public void deleteInterestPoint() {
-        UserInteraction.showText("These are the registered evidences: " + MapUniversity.getAllPointsNames());
-        String idPoint = UserInteraction.getInputString("\nPlease insert the name of one of them: ");
+        UserInteraction.showText("Please insert point's location\n");
+        int x=UserInteraction.getInputInt("Insert coordinate x: ");
+        int y=UserInteraction.getInputInt("Insert coordinate y: ");
         String checkDecision = UserInteraction.getInputString("¿Está usted seguro que desea eliminar el punto de interés? Press 'si' or any other letter for otherwise\n");
         if (checkDecision.equalsIgnoreCase("si")) {
-            MapUniversity.deletePoint(idPoint);
+            MapUniversity.deletePoint(x,y);
         } else {
             UserInteraction.showText("Okey, let's get back to the menu!\n");
         }
     }
+
 
 }

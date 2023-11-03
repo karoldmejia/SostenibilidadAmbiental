@@ -152,7 +152,7 @@ public class Project{
         }
     }
 
-    void updateEvidence(String idEvidence){
+    protected void updateEvidence(String idEvidence){
         EvidenceProject evidence=searchEvidence(idEvidence);
         if (evidence == null) {
             return;
@@ -160,9 +160,9 @@ public class Project{
         while (true) {
             UserInteraction.showText("Select the attribute to modify: \n1. Name\n2. Registration date\n");
             if (evidence instanceof Evidence){
-                UserInteraction.showText("4. Url\n");
+                UserInteraction.showText("3. Url\n");
             } else if (evidence instanceof Review) {
-                UserInteraction.showText("4. Url from list\n");
+                UserInteraction.showText("3. Url from list\n");
             }
             int opcion = UserInteraction.getInputInt("\nEnter the number of the desired option (0 to finish and apply changes): ");
             if (opcion == 0) {
@@ -176,9 +176,9 @@ public class Project{
                     updateDateEvidence(evidence);
                     break;
             }
-            if (evidence instanceof Evidence && opcion==4){
+            if (evidence instanceof Evidence && opcion==3){
                 updateSingleUrl(evidence);
-            } else if (evidence instanceof Review && opcion==4) {
+            } else if (evidence instanceof Review && opcion==3) {
                 updateMultipleUrl(evidence);
             } else {
                 UserInteraction.showText("Invalid option.");
@@ -302,7 +302,7 @@ public class Project{
         }
         return typeEvidence;
     }
-    void updateNameEvidence(EvidenceProject evidenceProject){
+    private void updateNameEvidence(EvidenceProject evidenceProject){
         String name = UserInteraction.getInputString("Enter the new name: ");
         if (isNameValid(name)) {
             evidenceProject.setNameEvidence(name);
@@ -372,9 +372,13 @@ public class Project{
             int axisY = UserInteraction.getInputInt("Ingresa la coordenada y: ");
             InterestPoint point = MapUniversity.getInterestPoint(axisX,axisY);
             if (point == null) {
-                String nombrePunto = UserInteraction.getInputString("Ingresa el nombre del punto de interés: ");
-                String codeQR = UserInteraction.getInputString("Ingresa el código QR del punto de interés: ");
-                point = new InterestPoint(nombrePunto, axisX, axisY, codeQR);
+                String namePoint = UserInteraction.getInputString("Ingresa el nombre del punto de interés: ");
+                String codeQR = MapUniversity.createQR();
+                while (!MapUniversity.isQRValid(codeQR)){
+                    codeQR = MapUniversity.createQR();
+                    MapUniversity.isQRValid(codeQR);
+                }
+                point = new InterestPoint(namePoint, axisX, axisY, codeQR);
                 MapUniversity.addInterestPoint(point);
             }
             point.addEvidence(evidence);
