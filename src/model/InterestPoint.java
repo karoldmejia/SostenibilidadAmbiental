@@ -64,10 +64,13 @@ public class InterestPoint {
         int counter=1;
         String typeEvidence = null;
         for (EvidenceProject evidence : getEvidences()){
+            if (evidence instanceof  Review && ((Review) evidence).evidenceStatus==false){
+                return;
+            }
             UserInteraction.showText(counter+". Evidence: "+evidence.getNameEvidence()+"\n");
             UserInteraction.showText(" Registration date: "+evidence.getRegisterDate()+"\n");
             String project = ProjectManagementService.findEvidenceProject(evidence);
-            UserInteraction.showText(" Proyecto perteneciente: "+project+"\n");
+            UserInteraction.showText(" Related project: "+project+"\n");
             if (evidence instanceof Evidence) {
                 if (evidence.getTypeEvidence() == CharTypeEvidence.A) {
                     typeEvidence = "Audio";

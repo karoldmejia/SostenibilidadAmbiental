@@ -14,6 +14,18 @@ public class Project{
     boolean status;
     ArrayList<EvidenceProject> evidences;
 
+    /**
+     * Constructor de la clase Project.
+     *
+     * @param nameProject       El nombre del proyecto.
+     * @param description       La descripción del proyecto.
+     * @param pilar             El pilar al que pertenece el proyecto.
+     * @param initialDate       La fecha de inicio del proyecto.
+     * @param finalDate         La fecha de finalización del proyecto.
+     * @param status            El estado del proyecto (activo o inactivo).
+     * @pre Ninguna.
+     * @post Se crea una instancia válida de la clase Project con los parámetros proporcionados.
+     */
     Project(String nameProject,String description,Pilar pilar,String initialDate,String finalDate,boolean status){
         idProject=nextId++;
         this.nameProject=nameProject;
@@ -30,11 +42,9 @@ public class Project{
     public String getNameProject() {
         return nameProject;
     }
-
     public String getDescription() {
         return description;
     }
-
     public ArrayList<DataGatherer> getAssociatedDataGatherers() {
         return associatedDataGatherers;
     }
@@ -87,12 +97,21 @@ public class Project{
     // Main methods ---------------------------------------------------
 
     String typeEvidenceOpt= "Please, select evidence's type:\n1. Audio (A)\n2. Video (V)\n3. Photo (P)\n4. Text (T)\n5. Results report (RR)\n";
-    protected void createEvidence(int userType){
+
+    /**
+     * Creates an evidence based on user input and associates it with the project, adhering to specific user privileges.
+     *
+     * @param userType   Type of the user creating the evidence.
+     * @param project    The project to associate the evidence with.
+     * @pre The user must have appropriate privileges. The evidence name and registration date must be valid.
+     * @post If requirements are met, an evidence is created and linked to the project.
+     */
+    public void createEvidence(int userType, Project project){
         boolean flag=false;
         int optEvidence=0;
         String nameEvidence=null, registerDate=null;
         if (userType==3) {
-            optEvidence = UserInteraction.getInputInt("Desea añadir:\n1. Reseña\n2. Evidencia común\n");
+            optEvidence = UserInteraction.getInputInt("Do you wish to add:\n1. Review\n2. Other evidence\n");
         } else if (userType==2) {
             optEvidence=1;
             if (!(UserCredentialService.searchDataGathererAssociated(getAssociatedDataGatherers()))){
@@ -100,27 +119,37 @@ public class Project{
             }
         }
         while (!flag){
-            nameEvidence= UserInteraction.getInputString("Ingresa el nombre: ");
+            nameEvidence= UserInteraction.getInputString("Enter the name: ");
             registerDate = UserInteraction.getInputString("Enter the registration date: ");
             if (isNameValid(nameEvidence) && isDateValid(registerDate) && getStatus()){
                 flag=true;
             } else if (!getStatus()) {
-                UserInteraction.showText("Lo siento, no puedes agregar evidencias a este proyecto ya que no se encuentra disponible\n");
+                UserInteraction.showText("I'm sorry, you can't add evidences to this project because it isn't available anymore\n");
                 return;
             }
         }
         if (flag) {
             if ((userType == 2 || userType == 3) && optEvidence == 1) {
-                createReview(nameEvidence, registerDate, userType);
+                createReview(nameEvidence, registerDate, userType, project);
             } else if (userType == 3 && optEvidence == 2) {
-                createCommonEvidence(nameEvidence, registerDate);
+                createCommonEvidence(nameEvidence, registerDate, project);
             }
         }
     }
 
-    private void createReview(String nameEvidence, String registerDate, int userType){
+    /**
+     * Creates a review for the project, based on the given information.
+     *
+     * @param nameEvidence   The name of the review.
+     * @param registerDate   The registration date of the review.
+     * @param userType       Type of the user creating the review.
+     * @param project        The project to associate the review with.
+     * @pre Valid user and project status, adequate review information.
+     * @post A new review is added to the project if requirements are met.
+     */
+    public void createReview(String nameEvidence, String registerDate, int userType, Project project){
         boolean evidenceStatus=false;
-        int cantUrl=UserInteraction.getInputInt("¿Cuántos enlaces desea agregar?: ");
+        int cantUrl=UserInteraction.getInputInt("How many URLs you with to add?: ");
         String[] listUrl=new String[cantUrl];
         if (userType==3) {
             evidenceStatus=true;
@@ -129,30 +158,45 @@ public class Project{
             listUrl[i]=UserInteraction.getInputString("Evidence no. "+(i+1)+": ");
         }
         CharTypeEvidence typeEvidence=CharTypeEvidence.R;
-        evidences.add(new Review(nameEvidence, registerDate, true, typeEvidence, evidenceStatus, listUrl));
-        int lastIndex = evidences.size() - 1;
-        EvidenceProject lastEvidence = evidences.get(lastIndex);
-        linkInterestPoint(lastEvidence);
+        Review review=new Review(nameEvidence, registerDate, true, typeEvidence, evidenceStatus, listUrl);
+        project.getEvidences().add(review);
+        linkInterestPoint(review);
         if (!evidenceStatus){
-            UserInteraction.showText("Creación exitosa, ahora tu reseña se encuentra pendiente por aprobación!\n");
+            UserInteraction.showText("Successful creation, now your review is pending approval!\n");
         } else {
-            UserInteraction.showText("Reseña creada exitosamente!\n");
-        }
-    }
-    private void createCommonEvidence(String nameEvidence, String registerDate){
-        String url= UserInteraction.getInputString("Ingresa la url: ");
-        int charTypeEvidence=UserInteraction.getInputInt(typeEvidenceOpt);
-        CharTypeEvidence typeEvidence=selectTypeEvidence(charTypeEvidence);
-        if (typeEvidence!=null){
-            evidences.add(new Evidence(nameEvidence,registerDate,true,typeEvidence,url));
-            int lastIndex = evidences.size() - 1;
-            EvidenceProject lastEvidence = evidences.get(lastIndex);
-            linkInterestPoint(lastEvidence);
-            UserInteraction.showText("Evidencia creada exitosamente!\n");
+            UserInteraction.showText("Review successfully created!\n");
         }
     }
 
-    protected void updateEvidence(String idEvidence){
+    /**
+     * Creates common evidence based on the provided details and associates it with the project.
+     *
+     * @param nameEvidence   The name of the evidence.
+     * @param registerDate   The registration date of the evidence.
+     * @param project        The project to associate the evidence with.
+     * @pre Valid user input and project status, adequate evidence information.
+     * @post A new common evidence is added to the project if requirements are met.
+     */
+    private void createCommonEvidence(String nameEvidence, String registerDate, Project project){
+        String url= UserInteraction.getInputString("Enter the URL: ");
+        int charTypeEvidence=UserInteraction.getInputInt(typeEvidenceOpt);
+        CharTypeEvidence typeEvidence=selectTypeEvidence(charTypeEvidence);
+        if (typeEvidence!=null){
+            Evidence evidence = new Evidence(nameEvidence,registerDate,true,typeEvidence,url);
+            project.getEvidences().add(evidence);
+            linkInterestPoint(evidence);
+            UserInteraction.showText("Review successfully created!\n");
+        }
+    }
+
+    /**
+     * Updates the details of an existing evidence in the project.
+     *
+     * @param idEvidence   The identifier of the evidence to be updated.
+     * @pre The evidence should exist within the project.
+     * @post The attributes of the selected evidence are modified if the evidence is found.
+     */
+    public void updateEvidence(String idEvidence){
         EvidenceProject evidence=searchEvidence(idEvidence);
         if (evidence == null) {
             return;
@@ -186,64 +230,88 @@ public class Project{
         }
         UserInteraction.showText("Changes applied successfully.");
     }
-    protected void ActivateDeactivateEvidence(String idEvidence){
+
+    /**
+     * Toggles the availability status of an evidence in the project.
+     *
+     * @param idEvidence   The identifier of the evidence to activate/deactivate.
+     * @pre The evidence should exist within the project.
+     * @post The availability of the evidence is altered based on the current state.
+     */
+    public void ActivateDeactivateEvidence(String idEvidence){
         EvidenceProject evidence=searchEvidence(idEvidence);
         if (evidence!=null) {
             if (evidence.getAvailability()){
                 evidence.setAvailability(false);
-                UserInteraction.showText("Evidencia desactivada.");
+                UserInteraction.showText("Evidence deactivated.");
                 return;
             } else{
                 evidence.setAvailability(true);
-                UserInteraction.showText("Evidencia desactivada.");
+                UserInteraction.showText("Evidence activated.");
                 return;
             }
 
         }
         UserInteraction.showText("We couldn't find any evidence");
     }
-    protected void reviewReviews() {
+
+    /**
+     * Reviews pending unreviewed reviews associated with the project.
+     *
+     * @param project   The project to review pending unreviewed reviews.
+     * @pre The project must contain pending reviews.
+     * @post The selected reviews are either approved or disapproved based on the reviewer's choice.
+     */
+    public void reviewReviews(Project project) {
         ArrayList<Review> unreviewedReviews = new ArrayList<>();
-        for (EvidenceProject evidence : evidences) {
+        for (EvidenceProject evidence : project.getEvidences()) {
             if (evidence instanceof Review && !((Review) evidence).getEvidenceStatus()) {
                 unreviewedReviews.add((Review) evidence);
             }
         }
         if (unreviewedReviews.isEmpty()) {
-            UserInteraction.showText("No se encontró ninguna review pendiente por revisión :)\n");
+            UserInteraction.showText("No pending review found for review :)\n");
             return;
         }
-        UserInteraction.showText("Por favor, elige la review que desees revisar, o 0 para salir:\n");
+        UserInteraction.showText("Please select the review you'd like to check, or press 0 to exit:\n");
         int optReview = -1;
         while (optReview != 0) {
             for (int i = 0; i < unreviewedReviews.size(); i++) {
                 UserInteraction.showText((i + 1) + ". " + unreviewedReviews.get(i).getNameEvidence()+"\n");
             }
-            optReview = UserInteraction.getInputInt("Ingresa tu opción: ");
+            optReview = UserInteraction.getInputInt("Please enter your choice: ");
             if (optReview == 0) {
                 break;
             }
             if (optReview < 1 || optReview > unreviewedReviews.size()) {
-                UserInteraction.showText("Opción inválida. Por favor, elige una opción válida.\n");
+                UserInteraction.showText("Invalid option. Please choose a valid option.\n");
             } else {
                 Review selectedReview = unreviewedReviews.get(optReview - 1);
-                int markReview = UserInteraction.getInputInt("¿Desea?\n1. Aprobar\n2. Desaprobar\nIngresa tu opción: ");
+                int markReview = UserInteraction.getInputInt("Would you like to?\n1. Approve\n2. Disapprove\nEnter your choice: ");
                 if (markReview == 1) {
                     selectedReview.setEvidenceStatus(true);
                     unreviewedReviews.remove(selectedReview);
-                    UserInteraction.showText("Review aprobada!\n");
+                    UserInteraction.showText("Review approved!\n");
                 } else if (markReview == 2) {
-                    evidences.remove(selectedReview);
+                    project.getEvidences().remove(selectedReview);
                     unreviewedReviews.remove(selectedReview);
-                    UserInteraction.showText("Review desaprobada!\n");
+                    selectedReview=null;
+                    UserInteraction.showText("Review disapproved!\n");
                 } else {
-                    UserInteraction.showText("Opción inválida. Por favor, elige 1 o 2.\n");
+                    UserInteraction.showText("Invalid option. Please, select 1 or 2.\n");
                 }
             }
         }
     }
 
     // Main methods ---------------------------------------------------
+
+    /**
+     * Searches for an evidence in the collection based on the provided evidence name.
+     *
+     * @param idEvidence The name of the evidence to search for.
+     * @return The found evidence; otherwise, null if not found.
+     */
     private EvidenceProject searchEvidence(String idEvidence) {
         for (EvidenceProject evidenceProject : evidences) {
             if (evidenceProject!=null && idEvidence.equals(evidenceProject.getNameEvidence())) {
@@ -253,6 +321,13 @@ public class Project{
         UserInteraction.showText("We couldn't find any evidence with that name :(\n");
         return null;
     }
+
+    /**
+     * Checks the validity of a provided evidence name against the existing collection.
+     *
+     * @param nameProject The name of the evidence to be validated.
+     * @return True if the name is unique; otherwise, false.
+     */
     private boolean isNameValid(String nameProject) {
         boolean flag=false;
         for (EvidenceProject evidenceProject : evidences) {
@@ -267,6 +342,13 @@ public class Project{
             return true;
         }
     }
+
+    /**
+     * Validates the date format to ensure its correctness.
+     *
+     * @param date The date to be validated.
+     * @return True if the date is in a valid format; otherwise, false.
+     */
     private boolean isDateValid(String date) {
         boolean flag;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -280,10 +362,17 @@ public class Project{
         if (flag){
             return true;
         } else {
-            UserInteraction.showText("El formato de fecha ingresado no es válido\n");
+            UserInteraction.showText("The date format entered isn't valid\n");
             return false;
         }
     }
+
+    /**
+     * Selects the evidence type based on the given type ID.
+     *
+     * @param typeEvidenceId The ID representing the type of evidence.
+     * @return The evidence type.
+     */
     private CharTypeEvidence selectTypeEvidence(int typeEvidenceId){
         CharTypeEvidence typeEvidence;
         if (typeEvidenceId==1) {
@@ -302,39 +391,69 @@ public class Project{
         }
         return typeEvidence;
     }
+
+    /**
+     * Updates the name of the evidence.
+     *
+     * @param evidenceProject The evidence to update.
+     */
     private void updateNameEvidence(EvidenceProject evidenceProject){
         String name = UserInteraction.getInputString("Enter the new name: ");
         if (isNameValid(name)) {
             evidenceProject.setNameEvidence(name);
         }
     }
+
+    /**
+     * Updates the registration date of the evidence.
+     *
+     * @param evidenceProject The evidence to update.
+     */
     private void updateDateEvidence(EvidenceProject evidenceProject){
         String date = UserInteraction.getInputString("Enter the new registration date: ");
         if (isDateValid(date)) {
             evidenceProject.setRegisterDate(date);
         }
     }
+
+    /**
+     * Updates the URL of a single URL-based evidence.
+     *
+     * @param evidenceProject The single URL evidence to update.
+     */
     private void updateSingleUrl(EvidenceProject evidenceProject){
         String url = UserInteraction.getInputString("Enter the new url: ");
         Evidence evidence = (Evidence) evidenceProject;
         evidence.setUrl(url);
     }
+
+    /**
+     * Updates multiple URLs of a review-based evidence.
+     *
+     * @param evidenceProject The review-based evidence to update.
+     */
     private void updateMultipleUrl(EvidenceProject evidenceProject){
         Review review=(Review) evidenceProject;
         int optUrl=-1;
         while (optUrl!=0) {
-            UserInteraction.showText("Por favor, elija cuál url desea cambiar\n");
+            UserInteraction.showText("Please choose which URL you'd like to change\n");
             for (int i = 0; i < review.getListUrl().length; i++) {
                 UserInteraction.showText((i+1) + ". " + review.getListUrl()[i]+"\n");
             }
-            optUrl = UserInteraction.getInputInt("Ingrese su elección o '0' para salir: ");
+            optUrl = UserInteraction.getInputInt("Enter your choice or '0' to exit: ");
             if (optUrl>=1 && optUrl<=review.getListUrl().length){
                 review.getListUrl()[(optUrl-1)] = UserInteraction.getInputString("Enter new url: ");
             } else {
-                UserInteraction.showText("Ingresa una opción válida");
+                UserInteraction.showText("Please input a valid option");
             }
         }
     }
+
+    /**
+     * Counts the number of evidences and reviews in the project.
+     *
+     * @return An array with the count of evidences and reviews respectively.
+     */
     protected int[] countEvidences(){
         int[] cantEvidencesProject=new int[2];
         int cEvidences=0;
@@ -352,6 +471,12 @@ public class Project{
         cantEvidencesProject[1]=cReviews;
         return cantEvidencesProject;
     }
+
+    /**
+     * Retrieves the names of all evidences associated with the project.
+     *
+     * @return A string containing all evidence names.
+     */
     protected String getAllEvidencesNames() {
         StringBuilder evidencesNames = new StringBuilder();
         for (int i = 0; i < evidences.size(); i++) {
@@ -365,14 +490,19 @@ public class Project{
         return evidencesNames.toString();
     }
 
+    /**
+     * Links a point of interest to the evidence.
+     *
+     * @param evidence The evidence to link to a point of interest.
+     */
     private void linkInterestPoint(EvidenceProject evidence){
-        String addInterestPoint = UserInteraction.getInputString("¿Deseas vincular un punto de interés a la evidencia? Ingresa 'y' para afirmar, y cualquier otra letra para cancelar\n");
+        String addInterestPoint = UserInteraction.getInputString("Do you want to link a point of interest to the evidence? Enter 'y' to confirm, and any other letter to cancel\n");
         if (addInterestPoint.equalsIgnoreCase("y")) {
-            int axisX = UserInteraction.getInputInt("Ingresa la coordenada x: ");
-            int axisY = UserInteraction.getInputInt("Ingresa la coordenada y: ");
+            int axisX = UserInteraction.getInputInt("Enter the x-coordinate: ");
+            int axisY = UserInteraction.getInputInt("Enter the y-coordinate: ");
             InterestPoint point = MapUniversity.getInterestPoint(axisX,axisY);
             if (point == null) {
-                String namePoint = UserInteraction.getInputString("Ingresa el nombre del punto de interés: ");
+                String namePoint = UserInteraction.getInputString("Enter the name of the point of interest: ");
                 String codeQR = MapUniversity.createQR();
                 while (!MapUniversity.isQRValid(codeQR)){
                     codeQR = MapUniversity.createQR();
@@ -382,7 +512,7 @@ public class Project{
                 MapUniversity.addInterestPoint(point);
             }
             point.addEvidence(evidence);
-            UserInteraction.showText("Evidencia asociada al punto de interés exitosamente!\n");
+            UserInteraction.showText("The evidence associated with the point of interest was successful!\n");
         }
     }
 

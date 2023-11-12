@@ -10,7 +10,12 @@ public class UserCredentialService{
     private static int loggedInUserId;
     private String username, password, fullname, email, phone, universityArea, position;
 
-    protected void initializeUsers() {
+    /**
+     * Initializes the user list with default instances of Visitor, DataGatherer, and Researcher.
+     * @pre None.
+     * @post The user list contains default instances of different user types.
+     */
+    public void initializeUsers() {
         userList.add(new Visitor("dd","monomono"));
         userList.add(new DataGatherer("oo", "holahola", "oo oo", "oo@oo.com", "2020202020"));
         userList.add(new Researcher("uu", "saposapo", "uu uu", "uu@uu.com", "2020202020","uu","uu"));
@@ -18,6 +23,12 @@ public class UserCredentialService{
 
     // Sign in methods --------------------------------------------
 
+    /**
+     * Registers a new Visitor account.
+     * @param optUser - The user type identifier (1 for Visitor).
+     * @pre The user type is selected as Visitor, and required information is validated for registration.
+     * @post If successful, a new Visitor account is created and added to the user list.
+     */
     public void registerVisitor(int optUser) {
         if (optUser == 1 && registerInfo(1)) {
             userList.add(new Visitor(username, password));
@@ -25,6 +36,12 @@ public class UserCredentialService{
         }
     }
 
+    /**
+     * Registers a new Data Gatherer account.
+     * @param optUser - The user type identifier (2 for Data Gatherer).
+     * @pre The user type is selected as Data Gatherer, and all mandatory information is provided and validated for registration.
+     * @post If successful, a new Data Gatherer account is created and added to the user list.
+     */
     public void registerDataGatherer(int optUser) {
         if (optUser == 2 && registerInfo(2)) {
             userList.add(new DataGatherer(username, password, fullname, email, phone));
@@ -32,6 +49,12 @@ public class UserCredentialService{
         }
     }
 
+    /**
+     * Registers a new Researcher account.
+     * @param optUser - The user type identifier (3 for Researcher).
+     * @pre The user type is selected as Researcher, and all necessary information is validated for registration.
+     * @post If successful, a new Researcher account is created and added to the user list.
+     */
     public void registerResearcher(int optUser) {
         if (optUser == 3 && registerInfo(3)) {
             userList.add(new Researcher(username, password, fullname, email, phone, universityArea, position));
@@ -39,6 +62,13 @@ public class UserCredentialService{
         }
     }
 
+    /**
+     * Gathers and validates user information based on the specified user type for registration.
+     * @param userType - The type of user (Visitor, DataGatherer, Researcher).
+     * @return True if the registration process is successful; False otherwise.
+     * @pre Prompts for user information relevant to the specified user type.
+     * @post User information is validated and processed for registration based on user type criteria.
+     */
     private boolean registerInfo(int userType) {
         boolean registrationSuccess = false;
         boolean flag = false;
@@ -73,6 +103,14 @@ public class UserCredentialService{
     }
 
     // Login methods --------------------------------------------
+
+    /**
+     * Authenticates user credentials and logs them into the system.
+     * @param username - The provided username for login authentication.
+     * @param password - The provided password for login authentication.
+     * @pre The user list contains users with credentials for login.
+     * @post Logs in the user if valid credentials are provided; Else, it prompts for correct login information.
+     */
     public void loginUser(String username, String password) {
         boolean found = false;
         int userType = -1;
@@ -103,6 +141,12 @@ public class UserCredentialService{
 
     // Support methods --------------------------------------------
 
+    /**
+     * Checks if the password meets the required criteria.
+     * @param password - The password to validate.
+     * @return boolean - Returns true if the password length is at least 8 characters, false otherwise.
+     * @post A message is displayed if the password length requirement is not met.
+     */
     private boolean isValidPassword(String password) {
         if (password.length() >= 8) {
             return true;
@@ -112,6 +156,12 @@ public class UserCredentialService{
         }
     }
 
+    /**
+     * Verifies if the email format is valid.
+     * @param email - The email address to validate.
+     * @return boolean - Returns true if the email matches the specified format, false otherwise.
+     * @post An error message is shown if the email format doesn't meet the required criteria.
+     */
     private boolean isValidEmail(String email) {
         String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
         Pattern pattern = Pattern.compile(regex);
@@ -124,6 +174,12 @@ public class UserCredentialService{
         }
     }
 
+    /**
+     * Checks if the phone number is of a valid length.
+     * @param phone - The phone number to validate.
+     * @return boolean - Returns true if the phone number's length is at least 10 digits, false otherwise.
+     * @post An error message is displayed if the phone number's length requirement is not satisfied.
+     */
     private boolean isValidPhone(String phone) {
         if (phone.length() >= 10) {
             return true;
@@ -133,6 +189,11 @@ public class UserCredentialService{
         }
     }
 
+    /**
+     * Verifies if the username is available for use.
+     * @return boolean - Returns true if the username is unique, false if it already exists.
+     * @post If the username is already in use, an error message is shown.
+     */
     private boolean isUsernameValid() {
         for (User user : userList) {
             if (user != null && username.equals(user.getUsername())) {
@@ -142,6 +203,13 @@ public class UserCredentialService{
         }
         return true;
     }
+
+    /**
+     * Finds a specific Data Gatherer by their username.
+     * @param idDataGatherer - The username of the Data Gatherer to be searched.
+     * @return DataGatherer - Returns the Data Gatherer object if found, otherwise, returns null.
+     * @post If the Data Gatherer is not found, an error message is displayed.
+     */
     public static DataGatherer searchDataGatherer(String idDataGatherer) {
         for (User user : userList) {
             if (user instanceof DataGatherer) {
@@ -154,6 +222,13 @@ public class UserCredentialService{
         UserInteraction.showText("No se pudo encontrar ningún data gatherer con ese nombre :(");
         return null;
     }
+
+    /**
+     * Checks if the current user is associated with any Data Gatherers.
+     * @param associatedDataGatherers - The list of Data Gatherers associated with the current user.
+     * @return boolean - Returns true if the user is associated with any Data Gatherer, false otherwise.
+     * @post If the user is not associated with any Data Gatherers, an error message is shown.
+     */
     public static boolean searchDataGathererAssociated(ArrayList<DataGatherer> associatedDataGatherers){
         for (DataGatherer dataGatherer : associatedDataGatherers){
             if (dataGatherer.getIdUser()==loggedInUserId){

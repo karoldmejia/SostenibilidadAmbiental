@@ -1,13 +1,14 @@
 package model;
 public abstract class EvidenceProject {
-    int idEvidence=0;
+    private static int nextId = 1;
+    int idEvidence;
     String nameEvidence;
     String registerDate;
     boolean availability;
     CharTypeEvidence typeEvidence;
 
     EvidenceProject(String nameEvidence,String registerDate, boolean availability, CharTypeEvidence typeEvidence){
-        idEvidence+=1;
+        idEvidence=nextId++;
         this.nameEvidence=nameEvidence;
         this.registerDate=registerDate;
         this.availability=availability;
