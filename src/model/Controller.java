@@ -1,5 +1,9 @@
 package model;
 import java.util.ArrayList;
+
+/**
+ * Controller class handles the main logic and user interactions of the system.
+ */
 public class Controller{
     private UserCredentialService userCredentialService;
     private ProjectManagementService projectManagementService;
@@ -196,8 +200,8 @@ public class Controller{
     public void deleteProject(){
         if (projectManagementService.projects.size()>0) {
             String idProject=showSelectProjects();
-            String checkDecision=UserInteraction.getInputString("Are you sure you want to delete the project? Press 'si' or any other letter for otherwise\n");
-            if (checkDecision.equalsIgnoreCase("si")){
+            String checkDecision=UserInteraction.getInputString("Are you sure you want to delete the project? Press 'yes' or any other letter for otherwise\n");
+            if (checkDecision.equalsIgnoreCase("yes")){
                 projectManagementService.deleteProject(idProject);
             } else {
                 UserInteraction.showText("Okey, let's get back to the menu!\n");

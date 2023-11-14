@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * The Project class represents a project entity in the system.
+ * It contains information essential for managing evidences within the system.
+ */
 public class Project{
     private static int nextId = 1;
     int idProject;
@@ -15,16 +19,16 @@ public class Project{
     ArrayList<EvidenceProject> evidences;
 
     /**
-     * Constructor de la clase Project.
+     * Constructor for the Project class.
      *
-     * @param nameProject       El nombre del proyecto.
-     * @param description       La descripción del proyecto.
-     * @param pilar             El pilar al que pertenece el proyecto.
-     * @param initialDate       La fecha de inicio del proyecto.
-     * @param finalDate         La fecha de finalización del proyecto.
-     * @param status            El estado del proyecto (activo o inactivo).
-     * @pre Ninguna.
-     * @post Se crea una instancia válida de la clase Project con los parámetros proporcionados.
+     * @param nameProject   The project's name.
+     * @param description   The project's description.
+     * @param pilar         The pillar to which the project belongs.
+     * @param initialDate   The start date of the project.
+     * @param finalDate     The end date of the project.
+     * @param status        The status of the project (active or inactive).
+     * @pre None.
+     * @post A valid instance of the Project class is created with the provided parameters.
      */
     Project(String nameProject,String description,Pilar pilar,String initialDate,String finalDate,boolean status){
         idProject=nextId++;
@@ -39,56 +43,131 @@ public class Project{
     }
 
     // Getters
+
+    /**
+     * Retrieves the name of the project.
+     * @return The name of the project.
+     */
     public String getNameProject() {
         return nameProject;
     }
+
+    /**
+     * Retrieves the description of the project.
+     * @return The description of the project.
+     */
     public String getDescription() {
         return description;
     }
+
+    /**
+     * Retrieves the associated data gatherers of the project.
+     * @return The list of associated data gatherers.
+     */
     public ArrayList<DataGatherer> getAssociatedDataGatherers() {
         return associatedDataGatherers;
     }
 
+    /**
+     * Retrieves the category pillar of the project.
+     * @return The category pillar.
+     */
     public Pilar getPilar() {
         return pilar;
     }
 
+    /**
+     * Retrieves the initial date of the project.
+     * @return The initial date of the project.
+     */
     public String getInitialDate() {
         return initialDate;
     }
 
+    /**
+     * Retrieves the final date of the project.
+     * @return The final date of the project.
+     */
     public String getFinalDate() {
         return finalDate;
     }
+
+    /**
+     * Retrieves the status of the project.
+     * @return The status of the project.
+     */
     public boolean getStatus() {
         return status;
     }
+
+    /**
+     * Retrieves the list of evidences associated with the project.
+     * @return The list of evidences.
+     */
     public ArrayList<EvidenceProject> getEvidences() {
         return evidences;
     }
+
+    /**
+     * Retrieves unreviewed reviews associated with the project.
+     * @return The list of unreviewed reviews.
+     */
+    public ArrayList<Review> getUnreviewedReviews() {
+        ArrayList<Review> unreviewedReviews = new ArrayList<>();
+        for (EvidenceProject evidence : evidences) {
+            if (evidence instanceof Review && !((Review) evidence).getEvidenceStatus()) {
+                unreviewedReviews.add((Review) evidence);
+            }
+        }
+        return unreviewedReviews;
+    }
+
     // Setters
 
-
+    /**
+     * Sets the project's name.
+     * @param nameProject The new name for the project.
+     */
     public void setNameProject(String nameProject) {
         this.nameProject = nameProject;
     }
 
+    /**
+     * Sets the project's description.
+     * @param description The new description for the project.
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Sets the project's category pillar.
+     * @param pilar The category pillar to assign to the project.
+     */
     public void setPilar(Pilar pilar) {
         this.pilar = pilar;
     }
 
+    /**
+     * Sets the project's initial date.
+     * @param initialDate The new initial date for the project.
+     */
     public void setInitialDate(String initialDate) {
         this.initialDate = initialDate;
     }
 
+    /**
+     * Sets the project's final date.
+     * @param finalDate The new final date for the project.
+     */
     public void setFinalDate(String finalDate) {
         this.finalDate = finalDate;
     }
 
+    /**
+     * Sets the project's status.
+     * @param status The new status for the project.
+     */
     public void setStatus(boolean status) {
         this.status = status;
     }
@@ -149,13 +228,13 @@ public class Project{
      */
     public void createReview(String nameEvidence, String registerDate, int userType, Project project){
         boolean evidenceStatus=false;
-        int cantUrl=UserInteraction.getInputInt("How many URLs you with to add?: ");
+        int cantUrl=UserInteraction.getInputInt("How many URLs you wish to add?: ");
         String[] listUrl=new String[cantUrl];
         if (userType==3) {
             evidenceStatus=true;
         }
         for (int i=0;i<cantUrl;i++){
-            listUrl[i]=UserInteraction.getInputString("Evidence no. "+(i+1)+": ");
+            listUrl[i]=UserInteraction.getInputString("URL no. "+(i+1)+": ");
         }
         CharTypeEvidence typeEvidence=CharTypeEvidence.R;
         Review review=new Review(nameEvidence, registerDate, true, typeEvidence, evidenceStatus, listUrl);
@@ -196,36 +275,42 @@ public class Project{
      * @pre The evidence should exist within the project.
      * @post The attributes of the selected evidence are modified if the evidence is found.
      */
-    public void updateEvidence(String idEvidence){
-        EvidenceProject evidence=searchEvidence(idEvidence);
+    public void updateEvidence(String idEvidence) {
+        EvidenceProject evidence = searchEvidence(idEvidence);
         if (evidence == null) {
+            return;
+        } else if (evidence instanceof Review && !((Review) evidence).evidenceStatus || !evidence.getAvailability()) {
+            UserInteraction.showText("We couldn't find any evidence with that name :(\n");
             return;
         }
         while (true) {
             UserInteraction.showText("Select the attribute to modify: \n1. Name\n2. Registration date\n");
-            if (evidence instanceof Evidence){
+            if (evidence instanceof Evidence) {
                 UserInteraction.showText("3. Url\n");
             } else if (evidence instanceof Review) {
                 UserInteraction.showText("3. Url from list\n");
             }
-            int opcion = UserInteraction.getInputInt("\nEnter the number of the desired option (0 to finish and apply changes): ");
-            if (opcion == 0) {
+            int option = UserInteraction.getInputInt("\nEnter the number of the desired option (0 to finish and apply changes): ");
+            if (option == 0) {
                 break;
             }
-            switch (opcion) {
+            switch (option) {
                 case 1:
                     updateNameEvidence(evidence);
                     break;
                 case 2:
                     updateDateEvidence(evidence);
                     break;
-            }
-            if (evidence instanceof Evidence && opcion==3){
-                updateSingleUrl(evidence);
-            } else if (evidence instanceof Review && opcion==3) {
-                updateMultipleUrl(evidence);
-            } else {
-                UserInteraction.showText("Invalid option.");
+                case 3:
+                    if (evidence instanceof Evidence) {
+                        updateSingleUrl(evidence);
+                    } else if (evidence instanceof Review) {
+                        updateMultipleUrl(evidence);
+                    }
+                    break;
+                default:
+                    UserInteraction.showText("Invalid option.");
+                    break;
             }
         }
         UserInteraction.showText("Changes applied successfully.");
@@ -263,46 +348,39 @@ public class Project{
      * @post The selected reviews are either approved or disapproved based on the reviewer's choice.
      */
     public void reviewReviews(Project project) {
-        ArrayList<Review> unreviewedReviews = new ArrayList<>();
-        for (EvidenceProject evidence : project.getEvidences()) {
-            if (evidence instanceof Review && !((Review) evidence).getEvidenceStatus()) {
-                unreviewedReviews.add((Review) evidence);
-            }
-        }
+        ArrayList<Review> unreviewedReviews = project.getUnreviewedReviews();
+
         if (unreviewedReviews.isEmpty()) {
-            UserInteraction.showText("No pending review found for review :)\n");
+            UserInteraction.showText("No pending reviews found :)\n");
             return;
         }
-        UserInteraction.showText("Please select the review you'd like to check, or press 0 to exit:\n");
-        int optReview = -1;
-        while (optReview != 0) {
-            for (int i = 0; i < unreviewedReviews.size(); i++) {
-                UserInteraction.showText((i + 1) + ". " + unreviewedReviews.get(i).getNameEvidence()+"\n");
-            }
-            optReview = UserInteraction.getInputInt("Please enter your choice: ");
-            if (optReview == 0) {
+
+        while (true) {
+            if (unreviewedReviews.size()==0){
                 break;
             }
-            if (optReview < 1 || optReview > unreviewedReviews.size()) {
-                UserInteraction.showText("Invalid option. Please choose a valid option.\n");
+            for (int i = 0; i < unreviewedReviews.size(); i++) {
+                UserInteraction.showText((i + 1) + ". " + unreviewedReviews.get(i).getNameEvidence() + "\n");
+            }
+            int optReview = UserInteraction.getInputInt("Select the review to check (0 to exit): ");
+            if (optReview == 0 || optReview > unreviewedReviews.size()) {
+                break;
+            }
+            Review selectedReview = unreviewedReviews.get(optReview - 1);
+            int markReview = UserInteraction.getInputInt("Would you like to?\n1. Approve\n2. Disapprove\nEnter your choice: ");
+            if (markReview == 1) {
+                selectedReview.setEvidenceStatus(true);
+                unreviewedReviews.remove(selectedReview);
+                UserInteraction.showText("Review approved!\n");
+            } else if (markReview == 2) {
+                project.getEvidences().remove(selectedReview);
+                UserInteraction.showText("Review disapproved!\n");
             } else {
-                Review selectedReview = unreviewedReviews.get(optReview - 1);
-                int markReview = UserInteraction.getInputInt("Would you like to?\n1. Approve\n2. Disapprove\nEnter your choice: ");
-                if (markReview == 1) {
-                    selectedReview.setEvidenceStatus(true);
-                    unreviewedReviews.remove(selectedReview);
-                    UserInteraction.showText("Review approved!\n");
-                } else if (markReview == 2) {
-                    project.getEvidences().remove(selectedReview);
-                    unreviewedReviews.remove(selectedReview);
-                    selectedReview=null;
-                    UserInteraction.showText("Review disapproved!\n");
-                } else {
-                    UserInteraction.showText("Invalid option. Please, select 1 or 2.\n");
-                }
+                UserInteraction.showText("Invalid option. Please select 1 or 2.\n");
             }
         }
     }
+
 
     // Main methods ---------------------------------------------------
 
@@ -386,7 +464,7 @@ public class Project{
         } else if (typeEvidenceId==5) {
         typeEvidence = CharTypeEvidence.RR;
         } else {
-            UserInteraction.showText("La opción ingresada no es válida\n");
+            UserInteraction.showText("The option entered isn't valid\n");
             return null;
         }
         return typeEvidence;
@@ -436,15 +514,15 @@ public class Project{
         Review review=(Review) evidenceProject;
         int optUrl=-1;
         while (optUrl!=0) {
-            UserInteraction.showText("Please choose which URL you'd like to change\n");
+            UserInteraction.showText("Choose which URL you'd like to change\n");
             for (int i = 0; i < review.getListUrl().length; i++) {
                 UserInteraction.showText((i+1) + ". " + review.getListUrl()[i]+"\n");
             }
-            optUrl = UserInteraction.getInputInt("Enter your choice or '0' to exit: ");
+            optUrl = UserInteraction.getInputInt("Enter your choice (0 to exit): ");
             if (optUrl>=1 && optUrl<=review.getListUrl().length){
                 review.getListUrl()[(optUrl-1)] = UserInteraction.getInputString("Enter new url: ");
             } else {
-                UserInteraction.showText("Please input a valid option");
+                UserInteraction.showText("Please input a valid option\n");
             }
         }
     }
@@ -479,15 +557,37 @@ public class Project{
      */
     protected String getAllEvidencesNames() {
         StringBuilder evidencesNames = new StringBuilder();
+        int addedNames = 0;
+
         for (int i = 0; i < evidences.size(); i++) {
             EvidenceProject evidenceProject = evidences.get(i);
-            String name = evidenceProject.getNameEvidence();
-            evidencesNames.append(name);
-            if (i < evidences.size() - 1) {
-                evidencesNames.append(", ");
+            if (evidenceProject.getAvailability() && (evidenceProject instanceof Review && ((Review) evidenceProject).evidenceStatus) || evidenceProject instanceof Evidence) {
+                String name = evidenceProject.getNameEvidence();
+                evidencesNames.append(name);
+                addedNames++;
+
+                if (addedNames < countRelevantEvidences()) {
+                    evidencesNames.append(", ");
+                }
             }
         }
         return evidencesNames.toString();
+    }
+
+    /**
+     * Counts the number of relevant evidences associated with the project.
+     * Relevant evidences are either reviews or standard evidence items.
+     *
+     * @return The count of relevant evidences associated with the project.
+     */
+    private int countRelevantEvidences() {
+        int count = 0;
+        for (EvidenceProject evidence : evidences) {
+            if ((evidence instanceof Review && ((Review) evidence).evidenceStatus) || evidence instanceof Evidence) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**

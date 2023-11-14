@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.text.ParseException;
 
+/**
+ * The ProjectManagementService class manages operations related to projects within the system.
+ * It handles the creation, update, deletion, and querying of projects, as well as
+ * managing associated data gatherers and their contributions to specific projects.
+ */
 public class ProjectManagementService{
     static ArrayList<Project> projects = new ArrayList<>();
 
@@ -165,7 +170,7 @@ public class ProjectManagementService{
             DataGatherer dataGatherer=UserCredentialService.searchDataGatherer(idDataGatherer);
             if(dataGatherer!=null){
                 project.getAssociatedDataGatherers().add(dataGatherer);
-                UserInteraction.showText("Data gatherer has been successfully linked!");
+                UserInteraction.showText("Data gatherer has been successfully linked!\n");
             }
         }
     }
@@ -419,7 +424,6 @@ public class ProjectManagementService{
                 }
             }
         }
-
         if (nameProject!=null){
             return nameProject;
         } else {

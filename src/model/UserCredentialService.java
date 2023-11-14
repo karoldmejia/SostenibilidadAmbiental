@@ -4,6 +4,10 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+/**
+ * The UserCredentialService class is responsible for managing user credentials and authentication.
+ * It provides methods for user registration, login, and user-related operations.
+ */
 public class UserCredentialService{
 
     private static ArrayList<User> userList=new ArrayList<>();
@@ -29,10 +33,10 @@ public class UserCredentialService{
      * @pre The user type is selected as Visitor, and required information is validated for registration.
      * @post If successful, a new Visitor account is created and added to the user list.
      */
-    public void registerVisitor(int optUser) {
+    protected void registerVisitor(int optUser) {
         if (optUser == 1 && registerInfo(1)) {
             userList.add(new Visitor(username, password));
-            UserInteraction.showText("Visitor account succesfully created! Now you can log in");
+            UserInteraction.showText("Visitor account successfully created! Now you can log in");
         }
     }
 
@@ -42,10 +46,10 @@ public class UserCredentialService{
      * @pre The user type is selected as Data Gatherer, and all mandatory information is provided and validated for registration.
      * @post If successful, a new Data Gatherer account is created and added to the user list.
      */
-    public void registerDataGatherer(int optUser) {
+    protected void registerDataGatherer(int optUser) {
         if (optUser == 2 && registerInfo(2)) {
             userList.add(new DataGatherer(username, password, fullname, email, phone));
-            UserInteraction.showText("Data gatherer account succesfully created! Now you can log in");
+            UserInteraction.showText("Data gatherer account successfully created! Now you can log in");
         }
     }
 
@@ -55,10 +59,10 @@ public class UserCredentialService{
      * @pre The user type is selected as Researcher, and all necessary information is validated for registration.
      * @post If successful, a new Researcher account is created and added to the user list.
      */
-    public void registerResearcher(int optUser) {
+    protected void registerResearcher(int optUser) {
         if (optUser == 3 && registerInfo(3)) {
             userList.add(new Researcher(username, password, fullname, email, phone, universityArea, position));
-            UserInteraction.showText("Researcher account succesfully created! Now you can log in");
+            UserInteraction.showText("Researcher account successfully created! Now you can log in");
         }
     }
 
@@ -131,10 +135,10 @@ public class UserCredentialService{
             }
         }
         if (!found) {
-            UserInteraction.showText("El usuario o la contraseña son erróneos\n");
+            UserInteraction.showText("The username or password is incorrect\n");
             Main.credentialUser();
         } else {
-            UserInteraction.showText("Haz ingresado exitosamente!\n");
+            UserInteraction.showText("You have successfully logged in!\n");
             Main.menuUser(userType);
         }
     }
@@ -151,7 +155,7 @@ public class UserCredentialService{
         if (password.length() >= 8) {
             return true;
         } else {
-            UserInteraction.showText("La contraseña debe ser mayor o igual a 8 dígitos\n");
+            UserInteraction.showText("The password should be 8 characters or longer\n");
             return false;
         }
     }
@@ -169,7 +173,7 @@ public class UserCredentialService{
         if (matcher.matches()) {
             return true;
         } else {
-            UserInteraction.showText("El formato de correo ingresado no es vállido\n");
+            UserInteraction.showText("The email format entered is not valid\n");
             return false;
         }
     }
@@ -184,7 +188,7 @@ public class UserCredentialService{
         if (phone.length() >= 10) {
             return true;
         } else {
-            UserInteraction.showText("El número de celular debe ser mayor a 10 dígitos\n");
+            UserInteraction.showText("The phone number should be more than 10 digits\n");
             return false;
         }
     }
@@ -197,7 +201,7 @@ public class UserCredentialService{
     private boolean isUsernameValid() {
         for (User user : userList) {
             if (user != null && username.equals(user.getUsername())) {
-                UserInteraction.showText("Lo siento, el nombre de usuario que has ingresado ya está registrado. Por favor, elige un nombre de usuario diferente.\n");
+                UserInteraction.showText("Sorry, the username you entered is already registered. Please choose a different username.\n");
                 return false;
             }
         }
@@ -219,7 +223,7 @@ public class UserCredentialService{
                 }
             }
         }
-        UserInteraction.showText("No se pudo encontrar ningún data gatherer con ese nombre :(");
+        UserInteraction.showText("We couldn't find any data gatherer with that name :(\n");
         return null;
     }
 
@@ -235,8 +239,21 @@ public class UserCredentialService{
                 return true;
             }
         }
-        UserInteraction.showText("No puedes agregar evidencias a este proyecto ya que no estás vinculado a este :(\n");
+        UserInteraction.showText("You cannot add evidence to this project since you are not linked to it :(\n");
         return false;
+    }
+
+    /**
+     * Searches and retrieves a user based on the currently logged-in user's identification.
+     * @return The user corresponding to the current logged-in user ID, if found; otherwise, returns null.
+     */
+    public static User searchUser() {
+        for (User user : userList) {
+            if (user.getIdUser()==loggedInUserId) {
+                return user;
+            }
+        }
+        return null;
     }
 }
 

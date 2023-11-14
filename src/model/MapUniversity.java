@@ -2,8 +2,16 @@ package model;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * MapUniversity class manages the visualization and manipulation of the university map,
+ * allowing users to filter and navigate through various points of interest represented
+ * on the map, such as projects and their locations, and enabling interaction
+ * through point selection, review, and update operations.
+ */
 public class MapUniversity {
     private static InterestPoint[][] map = new InterestPoint[20][20];
+
+    // Main methods --------------------------------------------
 
     /**
      * Adds an interest point to the map grid.
@@ -25,29 +33,7 @@ public class MapUniversity {
                 }
             }
         } else {
-            UserInteraction.showText("Los valores ingresados se encuentran fuera del rango del mapa");
-        }
-    }
-
-    /**
-     * Retrieves the interest point at the specified coordinates.
-     *
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @return The interest point if found; otherwise, null.
-     * @pre The `x` and `y` coordinates should be within the grid range [0, 20).
-     * @post None.
-     */
-    public static InterestPoint getInterestPoint(int x, int y) {
-        InterestPoint point = null;
-        if (x >= 0 && x < 20 && y >= 0 && y < 20) {
-            point=map[x][y];
-        }
-        if (point!=null) {
-            return point;
-        }else{
-            UserInteraction.showText("No encontramos un punto de interés en esa ubicación!\n");
-            return null;
+            UserInteraction.showText("The values entered are outside map range");
         }
     }
 
@@ -85,6 +71,83 @@ public class MapUniversity {
                 }
             }
             System.out.println();
+        }
+    }
+
+    /**
+     * Deletes the interest point at the specified coordinates.
+     *
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @pre The `x` and `y` coordinates should be within the grid range [0, 20).
+     * @post The interest point is removed from the map grid.
+     */
+    public static void deletePoint(int x, int y) {
+        InterestPoint locationPoint = getInterestPoint(x,y);
+        if (locationPoint != null) {
+            locationPoint=null;
+            map[x][y]=null;
+            UserInteraction.showText("The interest's point has been removed\n");
+        }
+    }
+
+    /**
+     * Updates information about the interest point at the specified coordinates.
+     *
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @pre The `x` and `y` coordinates should be within the grid range [0, 20).
+     * @post The information for the interest point at the specified coordinates is updated.
+     */
+    protected static void updatePoint(int x, int y) {
+        InterestPoint point = getInterestPoint(x, y);
+        if (point == null || !point.hasApprovedEvidences()) {
+            return;
+        }
+        while (true) {
+            int opcion = UserInteraction.getInputInt("Select the attribute to modify (0 to finish and apply changes):\n1. Name\n2. Coordinates\n3. QR code\n");
+            if (opcion == 0) {
+                break;
+            }
+            switch (opcion) {
+                case 1:
+                    updateNamePoint(point);
+                    break;
+                case 2:
+                    updateCoordinates(point);
+                    break;
+                case 3:
+                    updateQR(point);
+                    break;
+                default:
+                    System.out.print("Please enter a valid option");
+                    break;
+            }
+        }
+        UserInteraction.showText("Changes applied successfully.");
+    }
+
+    // Support methods --------------------------------------------
+
+    /**
+     * Retrieves the interest point at the specified coordinates.
+     *
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @return The interest point if found; otherwise, null.
+     * @pre The `x` and `y` coordinates should be within the grid range [0, 20).
+     * @post None.
+     */
+    protected static InterestPoint getInterestPoint(int x, int y) {
+        InterestPoint point = null;
+        if (x >= 0 && x < 20 && y >= 0 && y < 20) {
+            point=map[x][y];
+        }
+        if (point!=null) {
+            return point;
+        }else{
+            UserInteraction.showText("We couldn't find an interest's point there!\n");
+            return null;
         }
     }
 
@@ -131,59 +194,6 @@ public class MapUniversity {
     }
 
     /**
-     * Deletes the interest point at the specified coordinates.
-     *
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @pre The `x` and `y` coordinates should be within the grid range [0, 20).
-     * @post The interest point is removed from the map grid.
-     */
-    public static void deletePoint(int x, int y) {
-        InterestPoint locationPoint = getInterestPoint(x,y);
-        if (locationPoint != null) {
-            locationPoint=null;
-            map[x][y]=null;
-            UserInteraction.showText("El punto de interés ha sido removido\n");
-        }
-    }
-
-    /**
-     * Updates information about the interest point at the specified coordinates.
-     *
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @pre The `x` and `y` coordinates should be within the grid range [0, 20).
-     * @post The information for the interest point at the specified coordinates is updated.
-     */
-    public static void updatePoint(int x, int y) {
-        InterestPoint point = getInterestPoint(x, y);
-        if (point == null) {
-            return;
-        }
-        while (true) {
-            int opcion = UserInteraction.getInputInt("Select the attribute to modify (0 to finish and apply changes):\n1. Name\n2. Coordinates\n3. QR code\n");
-            if (opcion == 0) {
-                break;
-            }
-            switch (opcion) {
-                case 1:
-                    updateNamePoint(point);
-                    break;
-                case 2:
-                    updateCoordinates(point);
-                    break;
-                case 3:
-                    updateQR(point);
-                    break;
-                default:
-                    System.out.print("Please enter a valid option");
-                    break;
-            }
-        }
-        UserInteraction.showText("Changes applied successfully.");
-    }
-
-    /**
      * Updates the name of the interest point.
      *
      * @param point The interest point to be updated.
@@ -191,7 +201,7 @@ public class MapUniversity {
      * @post The name of the interest point is updated.
      */
     private static void updateNamePoint(InterestPoint point){
-        String namePoint=UserInteraction.getInputString("Ingresa el nuevo nombre para el punto: ");
+        String namePoint=UserInteraction.getInputString("Enter the new point's name:");
         point.setNamePoint(namePoint);
     }
 
@@ -203,8 +213,8 @@ public class MapUniversity {
      * @post The coordinates of the interest point are updated.
      */
     private static void updateCoordinates(InterestPoint point){
-        int x = UserInteraction.getInputInt("Ingresa la nueva coordenada x: ");
-        int y = UserInteraction.getInputInt("Ingresa la nueva coordenada y: ");
+        int x = UserInteraction.getInputInt("Enter the new x-coordinate: ");
+        int y = UserInteraction.getInputInt("Enter the new y-coordinate: ");
         InterestPoint otherPoint = getInterestPoint(x,y);
         if (point!=null && otherPoint==null){
             map[point.getxAxis()][point.getyAxis()]=null;
@@ -212,7 +222,7 @@ public class MapUniversity {
             point.setyAxis(y);
             map[x][y]=point;
         } else {
-            UserInteraction.showText("Ya existe un punto en esta ubicación!\n");
+            UserInteraction.showText("Already exists a point in this location\n");
         }
     }
 
@@ -230,7 +240,7 @@ public class MapUniversity {
             MapUniversity.isQRValid(codeQR);
         }
         point.setCodeQr(codeQR);
-        UserInteraction.showText("Tu nuevo código es: "+codeQR+"\n");
+        UserInteraction.showText("Your new code is: "+codeQR+"\n");
     }
 
     /**
@@ -241,14 +251,26 @@ public class MapUniversity {
      * @pre The `x` and `y` coordinates should be within the grid range [0, 20).
      * @post The information for the interest point at the specified coordinates is displayed.
      */
-    public static void showPoint(int x, int y){
-        InterestPoint point = getInterestPoint(x,y);
-        if (point!=null){
-            UserInteraction.showText("- Interest point name: "+point.getNamePoint()+"\n");
-            UserInteraction.showText("- Code QR: "+point.getCodeQr()+"\n");
+    public static void showPoint(int x, int y) {
+        InterestPoint point = getInterestPoint(x, y);
+        String addComment = "o";
+        if (point != null && point.hasApprovedEvidences()) {
+            UserInteraction.showText("- Interest point name: " + point.getNamePoint() + "\n");
+            UserInteraction.showText("- Code QR: " + point.getCodeQr() + "\n\n");
             point.showEvidences();
+            point.showComments(point);
+            while (!(addComment.equalsIgnoreCase("y"))) {
+                addComment = UserInteraction.getInputString("Do you want to add a comment? Enter 'y' to confirm, and any other letter to exit\n");
+                if (addComment.equalsIgnoreCase("y")) {
+                    point.addComment(point);
+                } else {
+                    break;
+                }
+            }
         }
     }
+
+
 
 
 }

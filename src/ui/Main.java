@@ -72,7 +72,7 @@ public class Main {
                 System.out.println("2. Create an evidence");
             }
             if (userType == 3) {
-                System.out.println("3. Modify evidence\n4. Activate or deactivate evidence\n5. Register project\n6. Consult project\n7. Modify projecto\n8. Delete project\n9. Review review\n10. Link data gatherers to project\n11. Modify points of interest\n12. Delete points of interest");
+                System.out.println("3. Modify evidence\n4. Activate or deactivate evidence\n5. Register project\n6. Consult project\n7. Modify project\n8. Delete project\n9. Review review\n10. Link data gatherers to project\n11. Modify points of interest\n12. Delete points of interest");
             }
             optMenu = Main.txt.nextInt();
             Main.txt.nextLine();
@@ -112,7 +112,6 @@ public class Main {
                     case 12:
                         controller.deleteInterestPoint();
                         break;
-
                 }
             } else if (optMenu == 0) {
                 System.out.println("Redirecting to the homepage... ");

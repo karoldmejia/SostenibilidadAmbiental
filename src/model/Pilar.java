@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * Enum representing different pillars related to projects.
+ */
 public enum Pilar {
     Biodiversidad,
     Gestion_del_recurso_hidrico,
